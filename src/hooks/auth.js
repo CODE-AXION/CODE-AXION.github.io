@@ -19,9 +19,9 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     // const [isLoading, setIsLoading] = useState(true);
     // const [load, setLoad] = useState(true);
 
-        const {data: user, error, isLoading, mutate} = useSWR('/user', () =>
+        const {data: user, error, isLoading, mutate} = useSWR('api/v1/user', () =>
             axios
-            .get('/user')
+            .get('api/v1')
             // .then(res => res.data)
             .then(res => {
                 dispatch(setLoggedIn(true))
@@ -123,7 +123,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     const logout = async () => {
         try {
             if (!error) {
-                await axios.post('/logout');
+                await axios.post('/api/v1/logout');
                 dispatch(setLoggedIn(false))
                 await mutate();
             }
@@ -137,7 +137,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             await csrf();
             setErrors([]);
             setStatus(null);
-            const response = await axios.post('/login', props);
+            const response = await axios.post('/api/v1/login', props);
             dispatch(setLoggedIn(true))
             await mutate();
         } catch (error) {
