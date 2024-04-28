@@ -127,7 +127,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
                 dispatch(setLoggedIn(false))
                 await mutate();
             }
-            window.location.pathname = '/login';
+            window.location.pathname = '/#/login';
         } catch (error) {
             setError(error);
         }
