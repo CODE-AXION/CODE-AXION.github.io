@@ -1,7 +1,7 @@
 import Axios from 'axios'
 
 const axios = Axios.create({
-  baseURL: import.meta.env.VITE_APP_BACKEND_URL,
+  baseURL: 'https://codeaxion.com/api/v1',
   headers: {
     'X-Requested-With': 'XMLHttpRequest'
   },
