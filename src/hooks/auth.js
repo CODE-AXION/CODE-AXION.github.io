@@ -19,7 +19,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     // const [isLoading, setIsLoading] = useState(true);
     // const [load, setLoad] = useState(true);
 
-        const {data: user, error, isLoading, mutate} = useSWR('/api/user', () =>
+        const {data: user, error, isLoading, mutate} = useSWR('/api/v1/user', () =>
             axios
             .get('/api/user')
             // .then(res => res.data)
