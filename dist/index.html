@@ -18,6 +18,7 @@
       // the single page app to route accordingly.
       (function(l) {
         if (l.search[1] === '/' ) {
+          alert(1)
           var decoded = l.search.slice(1).split('&').map(function(s) { 
             return s.replace(/~and~/g, '&')
           }).join('?');
@@ -54,6 +55,7 @@
             document.querySelector('body').classList.remove('sidebar-expanded');
         }
     </script>   
-    <div id="root"></div>
+    <div id="root"></div>
+
   </body>
 </html>
