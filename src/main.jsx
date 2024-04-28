@@ -8,7 +8,7 @@ import store from './stores/store';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode> 
-    <Router>
+    <Router basename="/CODE-AXION.github.io">
       <ThemeProvider>
       <Provider store={store}>
         <App />

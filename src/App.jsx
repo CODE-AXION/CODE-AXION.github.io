@@ -4,8 +4,7 @@ import {
   Route,
   useLocation,
   createHashRouter,
-  RouterProvider,
-  HashRouter
+  RouterProvider
 } from 'react-router-dom';
 
 import { ToastContainer } from 'react-toastify';
