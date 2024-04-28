@@ -21,7 +21,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
         const {data: user, error, isLoading, mutate} = useSWR('api/v1/user', () =>
             axios
-            .get('api/v1')
+            .get('api/v1/user')
             // .then(res => res.data)
             .then(res => {
                 dispatch(setLoggedIn(true))
