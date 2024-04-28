@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import {
   Routes,
   Route,
-  useLocation
+  useLocation,
+  createHashRouter,
+  RouterProvider,
+  HashRouter
 } from 'react-router-dom';
 
 import { ToastContainer } from 'react-toastify';
@@ -50,10 +53,9 @@ function App() {
         <Route exact path="/categories/edit/:id" element={<EditCategory handleLoadingChange={(loadingChange) => setIsLoading(loadingChange)} />} /> {/* Pass handleLoadingChange */}
         {/* <Route exact path="/categories/show/:id" element={<ShowCategoryPage handleLoadingChange={(loadingChange) => setIsLoading(loadingChange)} />}  /> Pass handleLoadingChange */} 
 
+        <Route exact path="/" element={<Chat />} />
         <Route exact path="/login" element={<Login />} />
-
         
-        <Route exact path="/chat" element={<Chat />} />
       </Routes>
 
       <ToastContainer /> {/* Add this line */}

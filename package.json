@@ -2,7 +2,7 @@
   "name": "mosaic-react",
   "version": "0.1.0",
   "type": "module",
-  "homepage": "https://CODE-AXION.github.io/laravel_react_chat_application",
+  "homepage": "https://CODE-AXION.github.io",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
