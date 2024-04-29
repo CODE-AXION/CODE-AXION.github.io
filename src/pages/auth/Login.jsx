@@ -57,7 +57,7 @@ export default function SignIn({ handleLoadingChange }) {
 
   const { user, isLoading , login } = useAuth({
     middleware: 'guest',
-    redirectIfAuthenticated: '/chat'
+    redirectIfAuthenticated: '/'
   })
 
   const dispatch = useDispatch();

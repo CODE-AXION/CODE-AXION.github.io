@@ -193,7 +193,6 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     };
         
     const load = () => {
-        // console.log((!authUser))
         return (!authUser);
     }
     

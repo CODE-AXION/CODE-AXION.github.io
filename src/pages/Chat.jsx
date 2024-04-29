@@ -89,7 +89,7 @@ const Chat = () => {
 
         const fetchChatContacts = async () => {
             try {
-                const response = await axios.get('/api/chat/contacts');
+                const response = await axios.get('/api/v1/chat/contacts');
                 if (isMounted) {
                     setUserContacts(response.data.data);
                     setChatContactLoading(false)
@@ -115,7 +115,7 @@ const Chat = () => {
                     // console.log(selectedChatId)
                     if (enableLoading) setChatBoxLoading(true)
 
-                    const response = await axios.get(`/api/chat/?contact_user_id=${selectedChatId}&sender_id=${authUser.id}`);
+                    const response = await axios.get(`/api/v1/chat?contact_user_id=${selectedChatId}&sender_id=${authUser.id}`);
                     setMessages(response.data.data)
                     if (enableLoading) setChatBoxLoading(false)
                 }
@@ -130,11 +130,11 @@ const Chat = () => {
     useEffect(() => {
         let isMounted = true;
     
-        if (selectedChat?.pivot?.id != undefined) {
-            fetchChatMessages(selectedChat?.pivot?.id, isMounted);
+        if (selectedChat?.pivot?.channel_id != undefined) {
+            fetchChatMessages(selectedChat?.pivot?.channel_id, isMounted);
             
             const interval = setInterval(() => {
-                fetchChatMessages(selectedChat?.pivot?.id, isMounted, false);
+                fetchChatMessages(selectedChat?.pivot?.channel_id, isMounted, false);
             }, 10000);
     
             return () => {
@@ -150,7 +150,7 @@ const Chat = () => {
 
     const handleChatProfileClick = async (user) => {
         setSelectedChat(user);
-        fetchChatMessages(selectedChat?.pivot?.id)
+        fetchChatMessages(selectedChat?.pivot?.channel_id)
 
     };
 
@@ -161,8 +161,9 @@ const Chat = () => {
         if (!sendMessageChat.trim() || !selectedChat) return; 
 
         if (sendEditMessageChatId != '') {
-            const response = await axios.post(`/api/send-message/chat-id/${selectedChat?.pivot?.id}?edit_mode=on&id=${sendEditMessageChatId}`, {
-                message: sendMessageChat
+            await axios.post(`/api/v1/send-message/chat-id/${selectedChat?.pivot?.id}?edit_mode=on&id=${sendEditMessageChatId}`, {
+                message: sendMessageChat,
+                channel_id: selectedChat?.pivot?.channel_id,
             })
 
             setsendEditMessageChatId('');
@@ -170,15 +171,16 @@ const Chat = () => {
 
         } else {
 
-            const response = await axios.post(`/api/send-message/chat-id/${selectedChat?.pivot?.id}`, {
+            await axios.post(`/api/v1/send-message/chat-id/${selectedChat?.pivot?.id}`, {
                 receiver_id: selectedChat?.pivot?.contact_user_id,
+                channel_id: selectedChat?.pivot?.channel_id,
                 message: sendMessageChat
             })
         }
 
 
 
-        fetchChatMessages(selectedChat?.pivot?.id, true)
+        fetchChatMessages(selectedChat?.pivot?.channel_id, true)
 
         setSendMessageChat('');
 
@@ -221,7 +223,7 @@ const Chat = () => {
     const onClickRemoveMessage = async () => {
 
         if (sendEditMessageChatId != '') {
-            const response = await axios.post(`/api/send-message/chat-id/${selectedChat?.pivot?.id}?delete_mode=on&id=${sendEditMessageChatId}`).finally(() => {
+            await axios.post(`/api/send-message/chat-id/${selectedChat?.pivot?.channel_id}?delete_mode=on&id=${sendEditMessageChatId}`).finally(() => {
             });
 
             setSendDialogMessageChat('')
@@ -229,7 +231,7 @@ const Chat = () => {
 
             setIsDeleteDialogOpen(false);
 
-            fetchChatMessages(selectedChat?.pivot?.id, true)
+            fetchChatMessages(selectedChat?.pivot?.channel_id, true)
 
 
         }
