@@ -20,7 +20,7 @@ import BasicMenu from '../components/Chats/BasicMenu';
 import DeleteMessageDialog from '../components/Chats/DeleteMessageDialog';
 import ClearIcon from '@mui/icons-material/Clear';
 import Message from '../components/Chats/Message';
-
+import { useChat } from '../hooks/chat';
 
 const Chat = () => {
 
@@ -29,11 +29,11 @@ const Chat = () => {
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const [selectedChat, setSelectedChat] = useState([]); // State to store the selected chat profile
-    const [messages, setMessages] = useState([]); // State to store the messages
+    // const [selectedChat, setSelectedChat] = useState([]); // State to store the selected chat profile
+    // const [messages, setMessages] = useState([]); // State to store the messages
 
-    const [statusChatContactLoading, setChatContactLoading] = useState(false);
-    const [chatBoxLoading, setChatBoxLoading] = useState(false);
+    // const [statusChatContactLoading, setChatContactLoading] = useState(false);
+    // const [chatBoxLoading, setChatBoxLoading] = useState(false);
 
     const [sendMessageChat, setSendMessageChat] = useState('');
     const [sendDialogMessageChat, setSendDialogMessageChat] = useState('');
@@ -46,109 +46,77 @@ const Chat = () => {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 
-    const [userContacts, setUserContacts] = useState({});
+    // const [userContacts, setUserContacts] = useState({});
 
     const { load, isLoading, user } = useAuth({ middleware: 'auth' })
-
-
-    // const Message = ({ handelDeleteOnClick, onClick, isSender, sender, user, message, is_edited, is_deleted, profilePic }) => {
-
-    //     return (
-    //         <div className={isSender ? 'flex justify-end flex-start gap-4' : 'flex flex-start gap-4'}>
-    //             {!isSender && (
-    //                 <img className="w-10 h-10 rounded-full" src={profilePic} alt="Rounded avatar" />
-    //             )}
-    //             <div className='relative'>
-    //                 <div className='flex items-center gap-2 my-4 px-4 py-1 rounded text-sm bg-slate-100 border w-fit'>
-    //                     <div>
-    //                         <div className={is_deleted ? 'italic text-xs' : ''}>{message}</div>
-    //                     </div>
-
-    //                     <div className='relative'>
-    //                         {
-    //                             isSender &&
-    //                             <BasicMenu is_edited={is_edited} is_deleted={is_deleted} onClick={onClick} handelDeleteOnClick={handelDeleteOnClick} />
-    //                         }
-    //                     </div>
-
-    //                 </div>
-    //                 {!is_deleted &&
-    //                     <div className='absolute -bottom-1 right-0 text-xs' >{is_edited ? 'message edited' : ''}</div>
-    //                 }
-    //             </div>
-    //         </div>
-    //     );
+    const { statusChatContactLoading, selectedChat, setSelectedChat,chatBoxLoading , fetchChatMessages, messages , fetchChatContacts, userContacts } = useChat();
+    
+    // const fetchChatContacts = async (isMounted) => {
+    //     try {
+    //         const response = await axios.get('/api/v1/chat/contacts');
+    //         if (isMounted) {
+    //             setUserContacts(response.data.data);
+    //             setChatContactLoading(false)
+    //         }
+    //     } catch (error) {
+    //         toast.error(error)
+    //         console.error('Error fetching data:', error);
+    //     }
     // };
 
+    // useEffect(() => {
+    //     let isMounted = true;
 
+    //     setChatContactLoading(true,isMounted);
 
-    useEffect(() => {
-        let isMounted = true;
+    //     fetchChatContacts();
 
-        setChatContactLoading(true);
-
-        const fetchChatContacts = async () => {
-            try {
-                const response = await axios.get('/api/v1/chat/contacts');
-                if (isMounted) {
-                    setUserContacts(response.data.data);
-                    setChatContactLoading(false)
-                }
-            } catch (error) {
-                toast.error(error)
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        fetchChatContacts();
-
-        return () => {
-            isMounted = false;
-        };
-    }, []);
-
-    const fetchChatMessages = async (selectedChatId, isMounted, enableLoading = true) => {
-        try {
+    //     return () => {
+    //         isMounted = false;
+    //     };
+    // }, []);
+    // console.log(userContacts)
+    // const fetchChatMessages = async (selectedChatId, isMounted, enableLoading = true) => {
+    //     try {
             
-            if (selectedChatId != undefined) {
-                if (isMounted) {
-                    // console.log(selectedChatId)
-                    if (enableLoading) setChatBoxLoading(true)
+    //         if (selectedChatId != undefined) {
+    //             if (isMounted) {
+    //                 if (enableLoading) setChatBoxLoading(true)
 
-                    const response = await axios.get(`/api/v1/chat?contact_user_id=${selectedChatId}&sender_id=${authUser.id}`);
-                    setMessages(response.data.data)
-                    if (enableLoading) setChatBoxLoading(false)
-                }
-            }
+    //                 const response = await axios.get(`/api/v1/chat?contact_user_id=${selectedChatId}&sender_id=${authUser.id}`);
+    //                 setMessages(response.data.data)
+    //                 if (enableLoading) setChatBoxLoading(false)
+    //             }
+    //         }
 
-        } catch (error) {
-            toast.error(error)
-            console.error('Error fetching data:', error);
-        }
-    };
+    //     } catch (error) {
+    //         toast.error(error)
+    //         console.error('Error fetching data:', error);
+    //     }
+    // };
 
-    useEffect(() => {
-        let isMounted = true;
+    // useEffect(() => {
+    //     let isMounted = true;
     
-        if (selectedChat?.pivot?.channel_id != undefined) {
-            fetchChatMessages(selectedChat?.pivot?.channel_id, isMounted);
+    //     if (selectedChat?.pivot?.channel_id != undefined) {
+    //         fetchChatMessages(selectedChat?.pivot?.channel_id, isMounted);
             
-            const interval = setInterval(() => {
-                fetchChatMessages(selectedChat?.pivot?.channel_id, isMounted, false);
-            }, 10000);
+    //         const interval = setInterval(() => {
+    //             fetchChatMessages(selectedChat?.pivot?.channel_id, isMounted, false);
+    //         }, 10000);
     
-            return () => {
-                 // Clean up when component unmounts
-                isMounted = false; 
-                clearInterval(interval);
-            };
-        }
+    //         return () => {
+    //              // Clean up when component unmounts
+    //             isMounted = false; 
+    //             clearInterval(interval);
+    //         };
+    //     }
     
-    }, [selectedChat]);
+    // }, [selectedChat]);
     
 
 
-    const handleChatProfileClick = async (user) => {
+    const showSelectedChatMessages = async (user) => {
         setSelectedChat(user);
         fetchChatMessages(selectedChat?.pivot?.channel_id)
 
@@ -223,8 +191,7 @@ const Chat = () => {
     const onClickRemoveMessage = async () => {
 
         if (sendEditMessageChatId != '') {
-            await axios.post(`/api/send-message/chat-id/${selectedChat?.pivot?.channel_id}?delete_mode=on&id=${sendEditMessageChatId}`).finally(() => {
-            });
+            await axios.post(`/api/v1/send-message/chat-id/${selectedChat?.pivot?.id}?delete_mode=on&id=${sendEditMessageChatId}`)
 
             setSendDialogMessageChat('')
             setsendEditMessageChatId('');
@@ -331,7 +298,7 @@ const Chat = () => {
                                                 profileImg={user.avatar}
                                                 message={user.pivot.last_seen_message}
 
-                                                onClick={() => handleChatProfileClick(user)}
+                                                onClick={() => showSelectedChatMessages(user)}
                                                 key={user.id}
 
                                             />
@@ -345,7 +312,7 @@ const Chat = () => {
                                             profileImg={user.profilePic}
                                             message={user.last_message}
 
-                                            onClick={() => handleChatProfileClick(user)}
+                                            onClick={() => showSelectedChatMessages(user)}
                                             key={user.id}
 
                                         />
