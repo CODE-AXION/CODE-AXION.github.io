@@ -15,194 +15,82 @@ import IconButton from '@mui/material/IconButton';
 
 import ChatProfileSideWidget from '../components/Chats/ChatProfileSideWidget';
 import SendIcon from '@mui/icons-material/Send';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import BasicMenu from '../components/Chats/BasicMenu';
 import DeleteMessageDialog from '../components/Chats/DeleteMessageDialog';
 import ClearIcon from '@mui/icons-material/Clear';
 import Message from '../components/Chats/Message';
 import { useChat } from '../hooks/chat';
+import AddIcon from '@mui/icons-material/Add';
+import AddAccount from '../components/Chats/AddAccount';
+import { setMessage } from '../stores/chat/chat';
+
+
 
 const Chat = () => {
 
 
     const authUser = useSelector((state) => state.user.user);
+    const chat_message = useSelector((state) => state.chat.message);
+
+
+    const dispatch = useDispatch();
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    // const [selectedChat, setSelectedChat] = useState([]); // State to store the selected chat profile
-    // const [messages, setMessages] = useState([]); // State to store the messages
-
-    // const [statusChatContactLoading, setChatContactLoading] = useState(false);
-    // const [chatBoxLoading, setChatBoxLoading] = useState(false);
-
-    const [sendMessageChat, setSendMessageChat] = useState('');
-    const [sendDialogMessageChat, setSendDialogMessageChat] = useState('');
-
-    const [editMode, setEditMode] = useState(false);
-
-
-
-    const [sendEditMessageChatId, setsendEditMessageChatId] = useState('');
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-
-    // const [userContacts, setUserContacts] = useState({});
-
     const { load, isLoading, user } = useAuth({ middleware: 'auth' })
-    const { statusChatContactLoading, selectedChat, setSelectedChat,chatBoxLoading , fetchChatMessages, messages , fetchChatContacts, userContacts } = useChat();
-    
-    // const fetchChatContacts = async (isMounted) => {
-    //     try {
-    //         const response = await axios.get('/api/v1/chat/contacts');
-    //         if (isMounted) {
-    //             setUserContacts(response.data.data);
-    //             setChatContactLoading(false)
-    //         }
-    //     } catch (error) {
-    //         toast.error(error)
-    //         console.error('Error fetching data:', error);
-    //     }
-    // };
 
-    // useEffect(() => {
-    //     let isMounted = true;
+    const { 
+        fetchChatContacts,
+        isDeleteDialogOpen,
+        sendDialogMessageChat,
+        sendMessageChatClick,
+        showSelectedChatMessages,
+        handelDeleteOnClick,
+        handleCloseDeleteDialog,
+        disableEditMode,
+        onClickRemoveMessage,
+        
+        fetchUserContacts,
+        users,
 
-    //     setChatContactLoading(true,isMounted);
+        user_chats,
+        user_chats_loader,
 
-    //     fetchChatContacts();
+        chat_messages,
+        chat_messages_loader,
+        selectedChat,
+        user_contacts
 
-    //     return () => {
-    //         isMounted = false;
-    //     };
-    // }, []);
-    // console.log(userContacts)
-    // const fetchChatMessages = async (selectedChatId, isMounted, enableLoading = true) => {
-    //     try {
-            
-    //         if (selectedChatId != undefined) {
-    //             if (isMounted) {
-    //                 if (enableLoading) setChatBoxLoading(true)
+        } = useChat();
 
-    //                 const response = await axios.get(`/api/v1/chat?contact_user_id=${selectedChatId}&sender_id=${authUser.id}`);
-    //                 setMessages(response.data.data)
-    //                 if (enableLoading) setChatBoxLoading(false)
-    //             }
-    //         }
+    const [open, setOpen] = useState(false);
+    const [maxWidth, setMaxWidth] = useState('');
 
-    //     } catch (error) {
-    //         toast.error(error)
-    //         console.error('Error fetching data:', error);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     let isMounted = true;
-    
-    //     if (selectedChat?.pivot?.channel_id != undefined) {
-    //         fetchChatMessages(selectedChat?.pivot?.channel_id, isMounted);
-            
-    //         const interval = setInterval(() => {
-    //             fetchChatMessages(selectedChat?.pivot?.channel_id, isMounted, false);
-    //         }, 10000);
-    
-    //         return () => {
-    //              // Clean up when component unmounts
-    //             isMounted = false; 
-    //             clearInterval(interval);
-    //         };
-    //     }
-    
-    // }, [selectedChat]);
-    
-
-
-    const showSelectedChatMessages = async (user) => {
-        setSelectedChat(user);
-        fetchChatMessages(selectedChat?.pivot?.channel_id)
-
+    const handleClickOpen = async() => {
+        setOpen(true);
+        await fetchUserContacts();
+        console.log(users)
     };
 
-    const handleSendMessageChatClick = async (e) => {
-        e.preventDefault()
+    const addToContacts = async(sendContactId) => {
 
-        // Don't send empty messages or if no chat is selected
-        if (!sendMessageChat.trim() || !selectedChat) return; 
-
-        if (sendEditMessageChatId != '') {
-            await axios.post(`/api/v1/send-message/chat-id/${selectedChat?.pivot?.id}?edit_mode=on&id=${sendEditMessageChatId}`, {
-                message: sendMessageChat,
-                channel_id: selectedChat?.pivot?.channel_id,
-            })
-
-            setsendEditMessageChatId('');
-            setEditMode(false)
-
-        } else {
-
-            await axios.post(`/api/v1/send-message/chat-id/${selectedChat?.pivot?.id}`, {
-                receiver_id: selectedChat?.pivot?.contact_user_id,
-                channel_id: selectedChat?.pivot?.channel_id,
-                message: sendMessageChat
-            })
-        }
-
-
-
-        fetchChatMessages(selectedChat?.pivot?.channel_id, true)
-
-        setSendMessageChat('');
-
+        await axios.post(`/api/v1/add-user-contact`,{
+            'add_user_contact_id': sendContactId,
+        });
     }
-
-
-
-    const editChatMessage = (msg) => {
-        setSendMessageChat(msg.message)
-        setsendEditMessageChatId(msg.id)
-        setEditMode(true)
-
-    }
-
-    const handelDeleteOnClick = (message) => {
-        setSendMessageChat('')
-
-        setSendDialogMessageChat(message)
-        setsendEditMessageChatId(message.id)
-
-        setIsDeleteDialogOpen(true);
-    };
-
-    const handleCloseDeleteDialog = () => {
     
-        setSendDialogMessageChat('')
-        setIsDeleteDialogOpen(false);
 
+    const handleClose = () => {
+        addToContacts(maxWidth);
+        setOpen(false);
+        fetchChatContacts(true)
+        // console.log(maxWidth)
     };
 
-    const disableEditMode = () => {
-        setsendEditMessageChatId('')
-        setSendMessageChat('')
-        setSendDialogMessageChat('')
-        setEditMode(false)
-
-    }
-
-
-    const onClickRemoveMessage = async () => {
-
-        if (sendEditMessageChatId != '') {
-            await axios.post(`/api/v1/send-message/chat-id/${selectedChat?.pivot?.id}?delete_mode=on&id=${sendEditMessageChatId}`)
-
-            setSendDialogMessageChat('')
-            setsendEditMessageChatId('');
-
-            setIsDeleteDialogOpen(false);
-
-            fetchChatMessages(selectedChat?.pivot?.channel_id, true)
-
-
-        }
-    }
+    const handleMaxWidthChange = (event) => {
+        setMaxWidth(event.target.value);
+    };
 
     return (
         <>
@@ -238,17 +126,24 @@ const Chat = () => {
                                     <div className='border h-[80vh] w-4/12'>
 
                                         {/* MAIN HEADER */}
-                                        <div className='py-4 px-4 bg-slate-100 border-b border-slate-300'>
-                                            <div className='font-semibold'>
-                                                Messages
+                                        <div className='flex justify-between py-4 px-4 bg-slate-100 border-b border-slate-300'>
+                                            <div>
+                                                <div className='font-semibold'>
+                                                    Messages
+                                                </div>
+                                                <div className='text-xs'>
+                                                    Groups, Chat, Friends
+                                                </div>
                                             </div>
-                                            <div className='text-xs'>
-                                                Groups, Chat, Friends
+                                            <div>
+                                                <IconButton onClick={handleClickOpen} aria-label="delete">
+                                                    <AddIcon />
+                                                </IconButton>
                                             </div>
                                         </div>
                                         {/* statusChatContactLoading */}
 
-                                        {statusChatContactLoading && <LinearProgress />}
+                                        {user_chats_loader && <LinearProgress />}
 
                                         <div className='px-4'>
 
@@ -288,8 +183,8 @@ const Chat = () => {
 
                                         </div>
 
-                                        {/* {userContacts.conversations} */}
-                                        {userContacts?.conversations?.map((user) => (
+                                        {/* {user_chats.conversations} */}
+                                        {user_chats?.conversations?.map((user) => (
 
                                             <ChatProfileSideWidget
 
@@ -337,11 +232,11 @@ const Chat = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                {chatBoxLoading && <LinearProgress />}
+                                                {chat_messages_loader && <LinearProgress />}
 
                                                 {<div className='p-4 overflow-y-scroll h-[95%]'>
 
-                                                    {messages.map((msg, index) => (
+                                                    {chat_messages.map((msg, index) => (
                                                         <Message
                                                             key={msg.id}
                                                             sender={msg.sender}
@@ -352,7 +247,13 @@ const Chat = () => {
                                                             is_edited={msg.is_edited}
                                                             is_deleted={msg.is_deleted}
                                                             message_time={msg.created_at}
-                                                            onClick={() => editChatMessage(msg)}
+                                                            onClick={() => {
+                                                                dispatch(setMessage({
+                                                                    id: msg.id,
+                                                                    body: msg.message,
+                                                                    edit: true
+                                                                }))
+                                                            }}
                                                             handelDeleteOnClick={() => handelDeleteOnClick(msg)}
 
                                                         />
@@ -369,28 +270,31 @@ const Chat = () => {
                                         <div className='w-full bg-white pt-4 absolute bottom-0'>
 
                                             <div className='border-b px-4 py-1'>
-                                                <form action="" onSubmit={handleSendMessageChatClick}>
+                                                <form action="" onSubmit={sendMessageChatClick}>
 
                                                     <FormControl sx={{ width: '100%' }} variant="standard">
                                                         {/* <InputLabel htmlFor="standard-adornment-send">Send</InputLabel> */}
                                                         <Input
-                                                            onChange={(e) => setSendMessageChat(e.target.value)}
+                                                            onChange={(e) => dispatch(setMessage({
+                                                                ...chat_message,
+                                                                body: e.target.value
+                                                            }))}
 
-                                                            // onClick={(e) => handleSendMessageChatClick(e.target.value)}
-                                                            value={sendMessageChat}
+                                                            // onClick={(e) => sendMessageChatClick(e.target.value)}
+                                                            value={chat_message.body}
                                                             placeholder='Send'
                                                             id="standard-adornment-send"
                                                             endAdornment={
                                                                 <InputAdornment sx={{ mb: 1 }} position="end">
 
                                                                     {
-                                                                        editMode &&
+                                                                        chat_message.edit &&
                                                                         <IconButton onClick={disableEditMode} type="button" sx={{ mb: 1 }} aria-label="search">
                                                                             <ClearIcon color="error" sx={{ fontSize: 27 }} />
                                                                         </IconButton>
                                                                     }
                                                                     {
-                                                                        !editMode &&
+                                                                        !chat_message.edit &&
 
                                                                         <IconButton type="submit" sx={{ mb: 1 }} aria-label="search">
                                                                             <SendIcon color="primary" sx={{ fontSize: 27 }} />
@@ -414,7 +318,16 @@ const Chat = () => {
                 </div>
             </div>
             <DeleteMessageDialog open={isDeleteDialogOpen} onClose={handleCloseDeleteDialog} onClickRemoveMessage={onClickRemoveMessage} message={sendDialogMessageChat} />
+            <AddAccount
 
+                maxWidth={maxWidth}
+                handleClose={handleClose}
+                handleClickOpen={handleClickOpen}
+                // handleFullWidthChange={handleFullWidthChange}
+                handleMaxWidthChange={handleMaxWidthChange}
+                open={open}
+                users={user_contacts}
+            />
         </>
     );
 }
