@@ -289,7 +289,14 @@ const Chat = () => {
 
                                                                     {
                                                                         chat_message.edit &&
-                                                                        <IconButton onClick={disableEditMode} type="button" sx={{ mb: 1 }} aria-label="search">
+                                                                        <IconButton onClick={() => {
+                                                                            dispatch(setMessage({
+                                                                                id: '',
+                                                                                body: '',
+                                                                                dialog_message: '',
+                                                                                edit: false,           
+                                                                            }));
+                                                                        }} type="button" sx={{ mb: 1 }} aria-label="search">
                                                                             <ClearIcon color="error" sx={{ fontSize: 27 }} />
                                                                         </IconButton>
                                                                     }

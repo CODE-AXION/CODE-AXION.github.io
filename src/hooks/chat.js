@@ -8,6 +8,7 @@ import { setUserChatContacts, setUserChatContactsLoading,
     setMessage,
     setUserContactsLoading, setUserContacts
 } from '../stores/chat/chat';
+
 export const useChat = () => {
     
     // const setUserChatContacts = useSelector((state) => state.chat.setUserChatContacts);
@@ -191,16 +192,6 @@ export const useChat = () => {
 
     };
 
-    const disableEditMode = () => {
-        dispatch(setMessage({
-            id: '',
-            body: '',
-            dialog_message: '',
-            edit: false,           
-        }));
-    }
-
-
     const onClickRemoveMessage = async () => {
 
         if (!chat_message.edit) {
@@ -278,7 +269,6 @@ export const useChat = () => {
         
         handelDeleteOnClick,
         handleCloseDeleteDialog,
-        disableEditMode,
         onClickRemoveMessage,
 
         fetchUserContacts,
