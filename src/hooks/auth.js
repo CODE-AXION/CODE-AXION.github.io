@@ -40,7 +40,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             }),
             {
                 revalidateIfStale: true,
-                revalidateOnFocus: true,
+                revalidateOnFocus: false,
                 shouldRetryOnError: false
             }
             

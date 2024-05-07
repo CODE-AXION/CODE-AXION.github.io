@@ -3,11 +3,17 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     user_contacts: [],
     user_contacts_loader: false,
-    
+
     user_chats: [],
     user_chats_loader: false,
     chat_messages: [],
     chat_messages_loader: false,
+    contact_id: '',
+    ui: {
+        show_add_account_modal: false,
+        show_add_group_modal: false,
+        show_delete_message_confirmation_dialog: false
+    },
 
     message: {
         id: '',
@@ -30,42 +36,65 @@ export const chatSlice = createSlice({
             state.user_chats = action.payload;
             state.user_chats_loader = false;
         },
+
         setUserChatContactsLoading: (state) => {
             state.user_chats_loader = true;
         },
 
-        setUserChatMessages: (state,action) => {
+        setUserChatMessages: (state, action) => {
             state.chat_messages = action.payload
             state.chat_messages_loader = false
         },
+
         setChatMessagesLoading: (state) => {
             state.chat_messages_loader = true;
         },
 
-        setSelectedChat: (state,action) => {
+        setSelectedChat: (state, action) => {
             state.selectedChat = action.payload
         },
-       
-        setMessage: (state,action) => {
+
+        setMessage: (state, action) => {
             state.message = action.payload
         },
 
-        setUserContacts: (state,action) => {
+        setUserContacts: (state, action) => {
             state.user_contacts = action.payload
             state.user_contacts_loader = false
         },
 
-        setUserContactsLoading: (state,action) => {
+        setUserContactsLoading: (state, action) => {
             state.user_contacts_loader = action.payload
+        },
+
+        setContactId: (state, action) => {
+            state.contact_id = action.payload
+        },
+
+        // UI 
+        setShowAddAccountDialog: (state, action) => {
+            state.ui.show_add_account_modal = action.payload
+        },
+
+        setShowAddGroupDialog: (state, action) => {
+            state.ui.show_add_group_modal = action.payload
+        },
+
+        setShowDeleteMessageConfirmationDialog: (state, action) => {
+            state.ui.show_delete_message_confirmation_dialog = action.payload
         }
+
     },
 });
 
 export const { setUserChatContacts, setUserChatContactsLoading,
-               setUserChatMessages, setChatMessagesLoading,
-               setSelectedChat,
-               setMessage,
-               setUserContacts, setUserContactsLoading
-            } = chatSlice.actions;
+    setUserChatMessages, setChatMessagesLoading,
+    setSelectedChat,
+    setMessage,
+    setUserContacts, setUserContactsLoading,
+    setContactId,
+    setShowAddAccountDialog, setShowAddGroupDialog,
+    setShowDeleteMessageConfirmationDialog
+} = chatSlice.actions;
 
 export default chatSlice.reducer;

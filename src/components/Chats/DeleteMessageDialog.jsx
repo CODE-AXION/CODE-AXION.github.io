@@ -4,23 +4,44 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { useDispatch, useSelector } from 'react-redux';
+import { useChat } from '../../hooks/chat';
+import { setMessage,setShowDeleteMessageConfirmationDialog  } from '../../stores/chat/chat';
 
-export default function DeleteMessageDialog({ open, onClose,onClickRemoveMessage, message }) {
+export default function DeleteMessageDialog({ message }) {
+
+    const open = useSelector((state) => state.chat.ui.show_delete_message_confirmation_dialog);
+    const chat_message = useSelector((state) => state.chat.message)
+
+    const dispatch = useDispatch();
+
+    const { onClickRemoveMessage } = useChat()
+
+    const handleCloseDeleteDialog = () => {
+
+        dispatch(setMessage({
+            ...chat_message,
+            dialog_message: ''
+        }));
+
+        dispatch(setShowDeleteMessageConfirmationDialog(false));
+    };
+
     return (
         <Dialog
             open={open}
-            onClose={onClose}
+            onClose={handleCloseDeleteDialog}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
             <DialogTitle id="alert-dialog-title">{"Are you sure you want to remove this message?"}</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                    {message?.message}
+                    {message?.dialog_message}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
                 <Button color='error' onClick={onClickRemoveMessage} autoFocus>
                     Remove </Button>
             </DialogActions>

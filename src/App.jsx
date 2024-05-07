@@ -24,24 +24,26 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/auth/Login';
 import Chat from './pages/Chat';
 import CreateCategory from './pages/categories/CreateCategory'
-import { Backdrop, CircularProgress } from '@mui/material';
+import { Backdrop, CircularProgress, LinearProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 
 function App() {
 
   const location = useLocation();
-  const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.loading.isLoading);
 
-
+  
   // const [isLoading, setIsLoading] = useState(false);
   const [freezeScreen, setFreezeScreen] = useState(false);
-
+  
   useEffect(() => {
     document.querySelector('html').style.scrollBehavior = 'auto'
     window.scroll({ top: 0 })
     document.querySelector('html').style.scrollBehavior = ''
   }, [location.pathname]); // triggered on route change
+
+
+
   return (
     <>
 

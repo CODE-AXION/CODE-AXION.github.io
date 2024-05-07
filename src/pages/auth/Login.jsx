@@ -53,9 +53,9 @@ export default function SignIn({ handleLoadingChange }) {
   // useEffect(() => {
   //   handleLoadingChange(true); // Call handleLoadingChange once after component mounts
   // }, [])
-  
 
-  const { user, isLoading , login } = useAuth({
+
+  const { user, isLoading, login } = useAuth({
     middleware: 'guest',
     redirectIfAuthenticated: '/'
   })

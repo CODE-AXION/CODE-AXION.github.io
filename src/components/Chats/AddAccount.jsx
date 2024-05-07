@@ -7,42 +7,42 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import Switch from '@mui/material/Switch';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from '../../lib/axios';
+import { setContactId, setShowAddAccountDialog } from '../../stores/chat/chat';
+import { useChat } from '../../hooks/chat';
 
-export default function AddAccount({ users, open, setOpen, fullWidth, setFullWidth, maxWidth, setMaxWidth, handleClose, handleMaxWidthChange, handleFullWidthChange, handleClickOpen }) {
-    //   const [open, setOpen] = React.useState(false);
-    //   const [fullWidth, setFullWidth] = React.useState(true);
-    //   const [maxWidth, setMaxWidth] = React.useState('sm');
+export default function AddAccount({ users, handleClose, handleMaxWidthChange }) {
 
-    //   const handleClickOpen = () => {
-    //     setOpen(true);
-    //   };
+    const user_contacts = useSelector((state) => state.chat.user_contacts);
 
-    //   const handleClose = () => {
-    //     setOpen(false);
-    //   };
+    
+    const contact_id = useSelector((state) => state.chat.contact_id);
 
-    //   const handleMaxWidthChange = (event) => {
-    //     setMaxWidth(event.target.value);
-    //   };
 
-    //   const handleFullWidthChange = (event) => {
-    //     setFullWidth(event.target.checked);
-    //   };
+    const { fetchChatContacts } = useChat()
+    const dispatch = useDispatch();
+    const addAccount = async() => {
+        await axios.post(`/api/v1/add-user-contact`, {
+            'add_user_contact_id': contact_id,
+        });
+        dispatch(setContactId(''));
+        dispatch(setShowAddAccountDialog(false));
+        fetchChatContacts(true)
+    };
+
+    const open = useSelector((state) => state.chat.ui.show_add_account_modal);
+
 
     return (
         <>
-            <Button variant="outlined" onClick={handleClickOpen}>
-                Open max-width dialog
-            </Button>
             <Dialog
-            
+
                 open={open}
-                onClose={handleClose}
+                onClose={() => dispatch(setShowAddAccountDialog(false))}
             >
                 <DialogTitle>Contacts</DialogTitle>
                 <DialogContent>
@@ -63,16 +63,16 @@ export default function AddAccount({ users, open, setOpen, fullWidth, setFullWid
                             <InputLabel htmlFor="max-width">Contacts</InputLabel>
                             <Select
                                 autoFocus
-                                value={maxWidth}
-                                onChange={handleMaxWidthChange}
+                                value={contact_id}
+                                onChange={(e) => dispatch(setContactId(e.target.value))}
                                 label="Contacts"
                                 inputProps={{
                                     name: 'max-width',
                                     id: 'max-width',
                                 }}
                             >
-                                {users?.map((user) => (
-                   
+                                {user_contacts?.map((user) => (
+
                                     <MenuItem key={user?.id} value={user?.id}>{user?.name}</MenuItem>
                                 ))}
                             </Select>
@@ -80,7 +80,7 @@ export default function AddAccount({ users, open, setOpen, fullWidth, setFullWid
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Add</Button>
+                    <Button onClick={addAccount}>Add</Button>
                 </DialogActions>
             </Dialog>
         </>
