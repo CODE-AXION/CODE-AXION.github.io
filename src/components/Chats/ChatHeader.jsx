@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 const ChatHeader = () => {
 
     const selectedChat = useSelector((state) => state.chat.selectedChat);
-
+    // console.log(selectedChat)
     return (
         <div className='py-4 border bg-transparent'>
             <div className='pl-4 flex items-center gap-4'>
@@ -14,7 +14,7 @@ const ChatHeader = () => {
                 </div>
                 <div>
                     <div className='font-semibold'>{selectedChat.name}</div>
-                    <div className='text-xs text-slate-600'>2 members, 1 group</div>
+                    <div className='text-xs text-slate-600'>{selectedChat?.users?.length ?? '1'} members </div>
                 </div>
             </div>
         </div>

@@ -1,10 +1,11 @@
 import BasicMenu from "./BasicMenu";
 import { setMessage } from "../../stores/chat/chat";
+import { forwardRef } from "react";
 
-const Message = ({ msg }) => {
+const Message = forwardRef(({ msg }, ref) => {
 
     return (
-        <div className={msg.isSender ? 'flex justify-end flex-start gap-4' : 'flex flex-start gap-4'}>
+        <div  ref={ref}  className={msg.isSender ? 'flex justify-end flex-start gap-4' : 'flex flex-start gap-4'}>
             {!msg.isSender && (
                 <img className="w-10 h-10 rounded-full" src={msg.sender.avatar} alt="Rounded avatar" />
             )}
@@ -30,6 +31,7 @@ const Message = ({ msg }) => {
             </div>
         </div>
     );
-};
+});
+
 
 export default Message

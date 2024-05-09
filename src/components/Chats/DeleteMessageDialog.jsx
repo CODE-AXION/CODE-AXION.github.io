@@ -6,12 +6,14 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useDispatch, useSelector } from 'react-redux';
 import { useChat } from '../../hooks/chat';
-import { setMessage,setShowDeleteMessageConfirmationDialog  } from '../../stores/chat/chat';
+import { setMessage,setSelectedChat,setShowDeleteMessageConfirmationDialog  } from '../../stores/chat/chat';
 
 export default function DeleteMessageDialog({ message }) {
 
     const open = useSelector((state) => state.chat.ui.show_delete_message_confirmation_dialog);
     const chat_message = useSelector((state) => state.chat.message)
+    const authUser = useSelector((state) => state.user.user)
+    const selectedChat = useSelector((state) => state.chat.selectedChat)
 
     const dispatch = useDispatch();
 
@@ -42,7 +44,7 @@ export default function DeleteMessageDialog({ message }) {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
-                <Button color='error' onClick={onClickRemoveMessage} autoFocus>
+                <Button color='error' onClick={() => onClickRemoveMessage(authUser,selectedChat,chat_message)} autoFocus>
                     Remove </Button>
             </DialogActions>
         </Dialog>

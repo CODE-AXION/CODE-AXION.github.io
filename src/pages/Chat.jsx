@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
 import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
@@ -21,8 +21,11 @@ import SendMessageInput from '../components/Chats/SendMessageInput';
 import ChatHeader from '../components/Chats/ChatHeader';
 import { Header as AppChatHeader } from '../components/Chats/Header';
 import ChatProfile from '../components/Chats/ChatProfile';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import AddGroup from '../components/Chats/AddGroup';
+import { API_ROUTES } from '../lib/api/api_constants';
+import axios from '../lib/axios';
+import { setUserChatMessages } from '../stores/chat/chat';
 
 
 
@@ -32,10 +35,34 @@ const Chat = () => {
     const isLoggedIn = useSelector((state) => state?.user?.isLoggedIn);
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [page, setPage] = useState(1);
+    const [scrollToKey, setScrollToKey] = useState();
+    const itemRefs = useRef({});
+    const containerRef = useRef(null);
+    const scrollToMessage = (messageId) => {
+        const messageElement = itemRefs.current[messageId];
+        if (messageElement) {
+            // Calculate the distance of the message element from the top of the container
+            const container = containerRef.current;
+            const scrollTop = messageElement.offsetTop - container.offsetTop;
+            // Scroll to the calculated position
+            container.scrollTop = scrollTop;
+        }
+    };
+    useLayoutEffect(() => {
+        if (
+            scrollToKey === undefined ||
+            (containerRef.current).scrollTop !== 0
+        )
+            return;
+        // itemRefs.current[scrollToKey].scrollIntoView();
+        scrollToMessage(scrollToKey);
+
+    }, [scrollToKey]);
 
     const initAuthMiddleware = useAuth({ middleware: 'auth' })
-
-      const {
+    const dispatch = useDispatch()
+    const {
         user_chats,
         user_chats_loader,
         user_contacts,
@@ -46,9 +73,31 @@ const Chat = () => {
     } = useSelector((state) => state?.chat);
 
     const initLoadChat = useOnLoadChat();
-    
+
     if ((isLoggedIn != true) || (isLoggedIn == null)) return <LinearProgress />;
 
+    const handleScroll = async (e) => {
+        let element = e.target;
+        if (element.scrollTop === 0) {
+            //fetch messages
+            const response = await axios.get(`${API_ROUTES.chat.ChatMessages}?contact_user_id=${selectedChat?.pivot.channel_id}&sender_id=${authUser?.id}&page=${page + 1}`);
+            // console.log('old below')
+            // console.log(chat_messages)
+            // console.log('new below')
+            // console.log(response?.data?.data)
+            // setMessages(prevMessages => [...prevMessages, ...data.data]);
+            // console.log(...chat_messages,...response?.data?.data)
+            dispatch(setUserChatMessages([...response?.data?.data,...chat_messages]))
+            // console.log(chat_messages.reverse())
+            setScrollToKey(response?.data?.data[0]?.id);
+            // chat_messages = chat_messages.reverse()
+            setPage(page + 1);
+        }
+    }
+
+
+
+ 
     return (
         <>
             <div className="flex h-screen overflow-hidden">
@@ -121,7 +170,7 @@ const Chat = () => {
 
                                         </div>
 
-                                        {user_chats?.conversations?.map((user,index) => (
+                                        {user_chats?.conversations?.map((user, index) => (
 
                                             <ChatProfileSideWidget
 
@@ -146,12 +195,14 @@ const Chat = () => {
 
                                                 {chat_messages_loader && <LinearProgress />}
 
-                                                {<div className='p-4 overflow-y-scroll h-[95%]'>
+                                                {<div ref={containerRef} className='p-4 overflow-y-scroll h-[95%]' onScroll={handleScroll}>
 
                                                     {chat_messages.map((msg, index) => (
                                                         <Message
                                                             key={msg.id}
                                                             msg={msg}
+                                                            ref={(el) => (itemRefs.current[msg.id] = el)}
+                                                          
                                                         />
                                                     ))}
 
