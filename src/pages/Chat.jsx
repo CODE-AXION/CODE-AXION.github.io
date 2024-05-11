@@ -26,6 +26,7 @@ import AddGroup from '../components/Chats/AddGroup';
 import { API_ROUTES } from '../lib/api/api_constants';
 import axios from '../lib/axios';
 import { setUserChatMessages } from '../stores/chat/chat';
+import MessageList from '../components/Chats/MessageList';
 
 
 
@@ -80,8 +81,33 @@ const Chat = () => {
 
     const scrollToMessageById = (messageId) => {
         if (messageId) {
-           scrollToMessaged(messageId);
-       }
+            scrollToMessaged(messageId);
+        }
+    }
+
+    function mergeObjects(obj1, obj2) {
+        const merged = {};
+    
+        // Merge object1
+        for (const date in obj1) {
+            merged[date] = { ...obj1[date] }; // Create a shallow copy of the object
+        }
+    
+        // Merge object2
+        for (const date in obj2) {
+            if (merged[date]) {
+                // If the date already exists, concatenate the messages
+                merged[date] = {
+                    ...merged[date],
+                    messages: [...merged[date].messages, ...obj2[date].messages], // Create a new array
+                };
+            } else {
+                // If the date doesn't exist, simply add it to the merged object
+                merged[date] = obj2[date];
+            }
+        }
+    
+        return merged;
     }
 
     const scrollToMessaged = async (messageId) => {
@@ -91,10 +117,13 @@ const Chat = () => {
 
         while (!found) {
             const response = await axios.get(`${API_ROUTES.chat.ChatMessages}?contact_user_id=${selectedChat?.pivot?.channel_id}&sender_id=${authUser?.id}&page=${page + 1}`);
-            const messages = response?.data?.data;
-            if (!messages.length) break;
-            allMessages = [...messages,...allMessages];
-            dispatch(setUserChatMessages(allMessages))
+            const new_messages = response?.data?.data;
+            // if (!messages.length) break;
+
+            allMessages = mergeObjects(new_messages,allMessages);
+
+            dispatch(setUserChatMessages(allMessages));
+    
 
             setTimeout(() => {
                 const messageElement = itemRefs.current[response?.data?.data[0]?.id];
@@ -106,19 +135,32 @@ const Chat = () => {
             }, 0);
 
             console.log(page)
-            for (const msg of messages) {
-                if (msg.id === messageId) {
-                    found = true;
-                    break;
+            
+            for (const date in new_messages) {
+                if (found) break; // If already found, exit loop
+                const messages = new_messages[date]?.messages;
+                for (const msg of messages) {
+                    if (msg.id === messageId) {
+                        found = true;
+                        break; // Break out of the inner loop
+                    }
                 }
             }
+
+            // for (const msg of new_messages) {
+            //     if (msg.id === messageId) {
+            //         found = true;
+            //         break;
+            //     }
+            // }
             if (!found) {
                 page++;
             }
         }
         if (found) {
-            dispatch(setUserChatMessages([...allMessages,...chat_messages])); 
-            
+            dispatch(setUserChatMessages(mergeObjects(allMessages, chat_messages)));
+
+
             // setScrollToKey(messageId);
 
             // scrollToMessage(messageId)
@@ -132,7 +174,6 @@ const Chat = () => {
             }, 0);
         }
     };
-    console.log(chat_messages)
     const handleScroll = async (e) => {
         let element = e.target;
 
@@ -140,7 +181,7 @@ const Chat = () => {
         // if (scrollTop + clientHeight >= scrollHeight - 10) {
 
         //     console.log('df')
-            
+
         //     const response = await axios.get(`${API_ROUTES.chat.ChatMessages}?contact_user_id=${selectedChat?.pivot.channel_id}&sender_id=${authUser?.id}&page=${page - 1}`);
         //     // dispatch(setUserChatMessages([...chat_messages,...response?.data?.data]))
         //     // // console.log(chat_messages.reverse())
@@ -155,18 +196,29 @@ const Chat = () => {
         //     setPage(page - 1);
         // }
 
+
+
+
         if (element.scrollTop === 0) {
             const response = await axios.get(`${API_ROUTES.chat.ChatMessages}?contact_user_id=${selectedChat?.pivot.channel_id}&sender_id=${authUser?.id}&page=${page + 1}`);
-        
-            dispatch(setUserChatMessages([...response?.data?.data, ...chat_messages]))
-            setScrollToKey(response?.data?.data[0]?.id);
+            // console.log(Object.keys(response?.data?.data));
+            // console.log([...response?.data?.data, ...chat_messages])
+            let date = Object.keys(response?.data?.data)[0]
+            console.log(response?.data?.data[date]['messages'][0]?.id)
+            console.log(response?.data?.data, chat_messages)
+            const mergedObject = mergeObjects(response?.data?.data, chat_messages);
+            console.log(mergedObject)
+            dispatch(setUserChatMessages(mergedObject))
+            // Object.keys(responseData)[0];
+            // console.log(response?.data?.data)
+            setScrollToKey(response?.data?.data[date]['messages'][0]?.id);
             setPage(page + 1);
         }
     }
 
 
 
- 
+
     return (
         <>
             <div className="flex h-screen overflow-hidden">
@@ -267,28 +319,26 @@ const Chat = () => {
 
                                                 {<div ref={containerRef} className='p-4 overflow-y-scroll h-[95%]' onScroll={handleScroll}>
 
-                                                    {/* {chat_messages.map((msg, index) => (
-                                                        <Message
-                                                            key={msg.id}
-                                                            msg={msg}
-                                                            ref={(el) => (itemRefs.current[msg.id] = el)}
-                                                          
-                                                        />
-                                                    ))} */}
-
-                                                    {chat_messages.map(group => (
-                                                        <div key={group.date}>
-                                                            <div className="text-gray-500 font-semibold">{group.date}</div>
-                                                            {group.messages.map((msg, index) => (
+                                                    {/* <MessageList 
+                                                        messages={chat_messages}
+                                                        itemRefs={itemRefs}
+                                                    /> */}
+                                                    {Object.keys(chat_messages).map(date => (
+                                                        <React.Fragment key={date}>
+                                                            <div className='py-2 flex justify-center items-center'>
+                                                                <span id="msg_day" className='px-2 py-1 shadow font-medium rounded-lg text-gray-400 bg-white border-gray-300'>
+                                                                    {date}
+                                                                </span>
+                                                            </div>
+                                                            {chat_messages[date].messages.map((msg, index) => (
                                                                 <Message
                                                                     key={msg.id}
                                                                     msg={msg}
                                                                     ref={(el) => (itemRefs.current[msg.id] = el)}
                                                                 />
                                                             ))}
-                                                        </div>
+                                                        </React.Fragment>
                                                     ))}
-
                                                 </div>}
                                             </div>
 
