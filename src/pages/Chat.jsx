@@ -39,6 +39,7 @@ const Chat = () => {
     const [scrollToKey, setScrollToKey] = useState();
     const itemRefs = useRef({});
     const containerRef = useRef(null);
+
     const scrollToMessage = (messageId) => {
         const messageElement = itemRefs.current[messageId];
         if (messageElement) {
@@ -76,21 +77,89 @@ const Chat = () => {
 
     if ((isLoggedIn != true) || (isLoggedIn == null)) return <LinearProgress />;
 
+
+    const scrollToMessageById = (messageId) => {
+        if (messageId) {
+           scrollToMessaged(messageId);
+       }
+    }
+
+    const scrollToMessaged = async (messageId) => {
+        let found = false;
+        let page = 1;
+        let allMessages = []; // Array to store all messages
+
+        while (!found) {
+            const response = await axios.get(`${API_ROUTES.chat.ChatMessages}?contact_user_id=${selectedChat?.pivot?.channel_id}&sender_id=${authUser?.id}&page=${page + 1}`);
+            const messages = response?.data?.data;
+            if (!messages.length) break;
+            allMessages = [...messages,...allMessages];
+            dispatch(setUserChatMessages(allMessages))
+
+            setTimeout(() => {
+                const messageElement = itemRefs.current[response?.data?.data[0]?.id];
+                if (messageElement) {
+                    const container = containerRef.current;
+                    const scrollTop = messageElement.offsetTop - container.offsetTop;
+                    container.scrollTop = scrollTop;
+                }
+            }, 0);
+
+            console.log(page)
+            for (const msg of messages) {
+                if (msg.id === messageId) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                page++;
+            }
+        }
+        if (found) {
+            dispatch(setUserChatMessages([...allMessages,...chat_messages])); 
+            
+            // setScrollToKey(messageId);
+
+            // scrollToMessage(messageId)
+            setTimeout(() => {
+                const messageElement = itemRefs.current[messageId];
+                if (messageElement) {
+                    const container = containerRef.current;
+                    const scrollTop = messageElement.offsetTop - container.offsetTop;
+                    container.scrollTop = scrollTop;
+                }
+            }, 0);
+        }
+    };
+    console.log(chat_messages)
     const handleScroll = async (e) => {
         let element = e.target;
+
+        // const { scrollTop, clientHeight, scrollHeight } = containerRef.current;
+        // if (scrollTop + clientHeight >= scrollHeight - 10) {
+
+        //     console.log('df')
+            
+        //     const response = await axios.get(`${API_ROUTES.chat.ChatMessages}?contact_user_id=${selectedChat?.pivot.channel_id}&sender_id=${authUser?.id}&page=${page - 1}`);
+        //     // dispatch(setUserChatMessages([...chat_messages,...response?.data?.data]))
+        //     // // console.log(chat_messages.reverse())
+        //     // setScrollToKey(response?.data?.data[0]?.id);
+        //     // // chat_messages = chat_messages.reverse()
+        //     // setPage(page + 1);
+
+        //     dispatch(setUserChatMessages([...response?.data?.data,...chat_messages]))
+        //     // console.log(chat_messages.reverse())
+        //     setScrollToKey(response?.data?.data[0]?.id);
+        //     // chat_messages = chat_messages.reverse()
+        //     setPage(page - 1);
+        // }
+
         if (element.scrollTop === 0) {
-            //fetch messages
             const response = await axios.get(`${API_ROUTES.chat.ChatMessages}?contact_user_id=${selectedChat?.pivot.channel_id}&sender_id=${authUser?.id}&page=${page + 1}`);
-            // console.log('old below')
-            // console.log(chat_messages)
-            // console.log('new below')
-            // console.log(response?.data?.data)
-            // setMessages(prevMessages => [...prevMessages, ...data.data]);
-            // console.log(...chat_messages,...response?.data?.data)
-            dispatch(setUserChatMessages([...response?.data?.data,...chat_messages]))
-            // console.log(chat_messages.reverse())
+        
+            dispatch(setUserChatMessages([...response?.data?.data, ...chat_messages]))
             setScrollToKey(response?.data?.data[0]?.id);
-            // chat_messages = chat_messages.reverse()
             setPage(page + 1);
         }
     }
@@ -194,16 +263,30 @@ const Chat = () => {
                                                 <ChatHeader />
 
                                                 {chat_messages_loader && <LinearProgress />}
+                                                <button onClick={() => scrollToMessageById(113)}>Search for Message ID 1</button>
 
                                                 {<div ref={containerRef} className='p-4 overflow-y-scroll h-[95%]' onScroll={handleScroll}>
 
-                                                    {chat_messages.map((msg, index) => (
+                                                    {/* {chat_messages.map((msg, index) => (
                                                         <Message
                                                             key={msg.id}
                                                             msg={msg}
                                                             ref={(el) => (itemRefs.current[msg.id] = el)}
                                                           
                                                         />
+                                                    ))} */}
+
+                                                    {chat_messages.map(group => (
+                                                        <div key={group.date}>
+                                                            <div className="text-gray-500 font-semibold">{group.date}</div>
+                                                            {group.messages.map((msg, index) => (
+                                                                <Message
+                                                                    key={msg.id}
+                                                                    msg={msg}
+                                                                    ref={(el) => (itemRefs.current[msg.id] = el)}
+                                                                />
+                                                            ))}
+                                                        </div>
                                                     ))}
 
                                                 </div>}
