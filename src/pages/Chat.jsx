@@ -371,3 +371,19 @@ const Chat = () => {
 
 
 export default Chat
+
+
+// $messages = Message::with('receiver', 'sender')->where('channel_id', request('contact_user_id'))->latest()->orderBy('created_at', 'asc')->paginate($pageSize);
+            
+// $messages = $messages->reverse();
+// // Group messages by creation date
+// $groupedMessages = $messages->groupBy(function ($message) {
+//     return $message->created_at->format('Y-m-d'); // Group by day
+// });
+
+// $transformedMessages = $groupedMessages->map(function ($messages, $date) {
+//     return [
+//         'date' => $date,
+//         'messages' => MessageResource::collection($messages)
+//     ];
+// });
