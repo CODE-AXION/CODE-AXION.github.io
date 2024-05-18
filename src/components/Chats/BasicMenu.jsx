@@ -32,6 +32,7 @@ export default function BasicMenu({ msg, is_deleted }) {
         <>
             {!is_deleted &&
                 <div>
+
                     <IconButton
                         id="basic-button"
                         aria-controls={open ? 'basic-menu' : undefined}
@@ -53,31 +54,74 @@ export default function BasicMenu({ msg, is_deleted }) {
                             'aria-labelledby': 'basic-button',
                         }}
                     >
-                        <div onClick={handleClose}>
-                            <MenuItem onClick={(e) => dispatch(setMessage({
-                                id: msg.id,
-                                body: msg.message,
-                                edit: true
-                            }))} sx={{
-                                display: 'flex',
-                                gap: 2
-                            }}> <EditIcon sx={{ fontSize: 18 }} /> Edit</MenuItem>
-                        </div>
+                        {
+                            msg.isSender && (
+                                <div>
+                                    <div onClick={handleClose}>
+                                        <MenuItem onClick={() => {
+                                            dispatch(setMessage({
+                                                ...chat_message,
+                                                id: msg.id,
+                                                body: '',
+                                                dialog_message: msg.message,
+                                                reply_id: msg.id
+                                            }))
+                                        }} sx={{
+                                            display: 'flex',
+                                            gap: 2
+                                        }}>  Reply</MenuItem>
+                                    </div>
 
-                        <div onClick={handleClose}>
-                            <MenuItem onClick={() => {
-                                  dispatch(setMessage({
-                                    ...chat_message,
-                                    id: msg.id,
-                                    body: '',
-                                    dialog_message: msg.message           
-                                }))
-                                dispatch(setShowDeleteMessageConfirmationDialog(true));
-                            }} sx={{
-                                display: 'flex',
-                                gap: 2
-                            }}> <DeleteIcon sx={{ fontSize: 18 }} /> Delete</MenuItem>
-                        </div>
+                                    <div onClick={handleClose}>
+                                        <MenuItem onClick={(e) => dispatch(setMessage({
+                                            id: msg.id,
+                                            body: msg.message,
+                                            edit: true
+                                        }))} sx={{
+                                            display: 'flex',
+                                            gap: 2
+                                        }}> <EditIcon sx={{ fontSize: 18 }} /> Edit</MenuItem>
+                                    </div>
+
+                                    <div onClick={handleClose}>
+                                        <MenuItem onClick={() => {
+                                            dispatch(setMessage({
+                                                ...chat_message,
+                                                id: msg.id,
+                                                body: '',
+                                                dialog_message: msg.message
+                                            }))
+                                            dispatch(setShowDeleteMessageConfirmationDialog(true));
+                                        }} sx={{
+                                            display: 'flex',
+                                            gap: 2
+                                        }}> <DeleteIcon sx={{ fontSize: 18 }} /> Delete</MenuItem>
+                                    </div>
+
+
+                                </div>
+
+                            )
+                        }
+
+                        {
+                            (!msg.isSender) && (
+                                <div onClick={handleClose}>
+                                    <MenuItem onClick={() => {
+                                        dispatch(setMessage({
+                                            ...chat_message,
+                                            id: msg.id,
+                                            body: '',
+                                            dialog_message: msg.message,
+                                            reply_id: msg.id
+                                        }))
+                                    }} sx={{
+                                        display: 'flex',
+                                        gap: 2
+                                    }}>  Reply</MenuItem>
+                                </div>
+                            )
+                        }
 
 
                     </Menu>

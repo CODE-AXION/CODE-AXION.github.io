@@ -6,7 +6,7 @@ import chat, {
     setUserChatContacts, setUserChatContactsLoading,
     setUserChatMessages, setChatMessagesLoading,
     setMessage,
-    setUserContactsLoading, setUserContacts, setShowDeleteMessageConfirmationDialog
+    setUserContactsLoading, setUserContacts, setShowDeleteMessageConfirmationDialog, setChatMessagePage
 } from '../stores/chat/chat';
 import { getChatContacts, getUserChatMessages, getUserContacts, getUserGroupChatMessages, sendEditedMessageToUser, sendMessageToUser } from '../lib/api/chatApi';
 
@@ -14,7 +14,9 @@ export const useChat = () => {
 
 
     const dispatch = useDispatch();
-
+    const {
+        chat_message_page,
+    } = useSelector((state) => state?.chat);
     // // fetch sidebar chat contacts
     const fetchChatContacts = async (isMounted) => {
         try {
@@ -46,7 +48,7 @@ export const useChat = () => {
     };
 
     // fetch chat messages
-    const fetchChatMessages = async (authUser, selectedChatId, isMounted, enableLoading = true, is_group = false) => {
+    const fetchChatMessages = async (authUser, selectedChatId, isMounted, enableLoading = true, is_group = false,page) => {
         try {
 
             if (selectedChatId != undefined) {
@@ -58,7 +60,7 @@ export const useChat = () => {
 
                     } else {
 
-                        const response = await getUserChatMessages(selectedChatId, authUser.id);
+                        const response = await getUserChatMessages(selectedChatId, authUser.id,chat_message_page);
                         dispatch(setUserChatMessages(response.data.data))
                     }
                 }
@@ -119,10 +121,12 @@ export const useChat = () => {
                     receiver_id: selectedChat?.pivot?.contact_user_id,
                     channel_id: selectedChat?.pivot?.channel_id,
                     message: chat_message.body,
-                    is_group: false
+                    is_group: false,
+                    reply_id: chat_message.reply_id
                 })
             }
 
+            dispatch(setChatMessagePage(1))
             fetchChatMessages(authUser, selectedChat?.pivot?.channel_id, true, false, false)
         }
 

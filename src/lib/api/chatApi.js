@@ -23,9 +23,9 @@ export const getUserContacts = async () => {
 };
 
 
-export const getUserChatMessages = async (selectedChatId,id) => {
+export const getUserChatMessages = async (selectedChatId,id,page) => {
     try {
-        const { data } = await axios.get(`${API_ROUTES.chat.ChatMessages}?contact_user_id=${selectedChatId}&sender_id=${id}&page=1`);
+        const { data } = await axios.get(`${API_ROUTES.chat.ChatMessages}?contact_user_id=${selectedChatId}&sender_id=${id}&page=${page}`);
         return { error: null, data };
     } catch (error) {
         return handleApiError(error);

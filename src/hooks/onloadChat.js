@@ -3,11 +3,15 @@ import axios from '../lib/axios';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useChat } from './chat';
+import { setChatMessagePage } from '../stores/chat/chat';
 
 
 export const useOnLoadChat = () => {
 
     const { selectedChat } = useSelector((state) => state?.chat);
+
+    const chat_message_page = useSelector((state) => state?.chat.chat_message_page);
+    const dispatch = useDispatch();
 
     const authUser = useSelector((state) => state?.user?.user);
     const { fetchChatMessages, fetchChatContacts } = useChat();
@@ -26,17 +30,18 @@ export const useOnLoadChat = () => {
 
         if (selectedChatObject?.id != undefined) {
 
-            fetchChatMessages(authUser,selectedChatObject?.id, isMounted, true, selectedChatObject?.is_group);
+            fetchChatMessages(authUser,selectedChatObject?.id, isMounted, true, selectedChatObject?.is_group, chat_message_page);
 
-            const interval = setInterval(() => {
-                fetchChatMessages(authUser,selectedChatObject?.id, isMounted, false, selectedChatObject?.is_group);
-            }, 90000);
+            // const interval = setInterval(() => {
+            //     dispatch(setChatMessagePage(1)) 
+            //     // fetchChatMessages(authUser,selectedChatObject?.id, isMounted, false, selectedChatObject?.is_group);
+            // }, 15000);
 
-            return () => {
+            // return () => {
 
-                isMounted = false;
-                clearInterval(interval);
-            };
+            //     isMounted = false;
+            //     clearInterval(interval);
+            // };
         }
 
     }, [selectedChat]);

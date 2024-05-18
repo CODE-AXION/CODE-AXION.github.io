@@ -20,9 +20,10 @@ const initialState = {
         body: '',
         dialog_message: '',
         edit: false,
+        reply_id: ''
     },
 
-
+    chat_message_page: 1,
     selectedChat: [],
     mode: '',
     chat_message: ''
@@ -82,6 +83,9 @@ export const chatSlice = createSlice({
 
         setShowDeleteMessageConfirmationDialog: (state, action) => {
             state.ui.show_delete_message_confirmation_dialog = action.payload
+        },
+        setChatMessagePage: (state,action) => {
+            state.chat_message_page = action.payload
         }
 
     },
@@ -94,7 +98,8 @@ export const { setUserChatContacts, setUserChatContactsLoading,
     setUserContacts, setUserContactsLoading,
     setContactId,
     setShowAddAccountDialog, setShowAddGroupDialog,
-    setShowDeleteMessageConfirmationDialog
+    setShowDeleteMessageConfirmationDialog,
+    setChatMessagePage
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
