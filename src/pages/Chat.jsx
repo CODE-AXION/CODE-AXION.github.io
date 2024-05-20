@@ -47,7 +47,7 @@ const Chat = () => {
             // Calculate the distance of the message element from the top of the container
             const container = containerRef.current;
             const scrollTop = messageElement.offsetTop - container.offsetTop;
-            // Scroll to the calculated position
+
             // container.scrollTop = scrollTop;
             containerRef.current.scrollTop = 100;
         }
@@ -76,7 +76,6 @@ const Chat = () => {
         message: chat_message,
     } = useSelector((state) => state?.chat);
 
-    // Use useEffect to perform actions after dispatching
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -254,13 +253,13 @@ const Chat = () => {
 
                                 {/* <div className="sm:flex sm:justify-between sm:items-center mb-8">
 
-                                <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-                                    <Link to={'/categories'}>
-                                        <Button variant="contained">List Categories</Button>
-                                    </Link>
-                                </div>
+                                    <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+                                        <Link to={'/categories'}>
+                                            <Button variant="contained">List Categories</Button>
+                                        </Link>
+                                    </div>
 
-                            </div> */}
+                                </div> */}
 
 
                                 {/* Cards */}
