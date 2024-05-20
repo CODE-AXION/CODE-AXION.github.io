@@ -55,7 +55,7 @@ export const useChat = () => {
                 if (isMounted) {
                     if (enableLoading) dispatch(setChatMessagesLoading(true))
                     if (is_group == true) {
-                        const response = await getUserGroupChatMessages(selectedChatId, authUser.id);
+                        const response = await getUserGroupChatMessages(selectedChatId, authUser.id,chat_message_page);
                         dispatch(setUserChatMessages(response.data.data))
 
                     } else {
@@ -87,7 +87,8 @@ export const useChat = () => {
                     message: chat_message?.body,
                     group_id: selectedChat?.id,
                     sender_id: authUser.id,
-                    is_group: true
+                    is_group: true,
+                    reply_id: chat_message.reply_id
                 })
 
             }
@@ -102,6 +103,7 @@ export const useChat = () => {
 
             }
 
+            dispatch(setChatMessagePage(1))
             fetchChatMessages(authUser, selectedChat?.id, true, false, true)
         }
 

@@ -33,10 +33,10 @@ export const getUserChatMessages = async (selectedChatId,id,page) => {
 };
 
 
-export const getUserGroupChatMessages = async(selectedGroupChatId,id) =>
+export const getUserGroupChatMessages = async(selectedGroupChatId,id,page) =>
 {
     try {
-        const { data } = await axios.get(`${API_ROUTES.chat.ChatMessages}?group_id=${selectedGroupChatId}&sender_id=${id}`);
+        const { data } = await axios.get(`${API_ROUTES.chat.ChatMessages}?group_id=${selectedGroupChatId}&sender_id=${id}&page=${page}`);
         return { error: null, data };
     } catch (error) {
         return handleApiError(error);

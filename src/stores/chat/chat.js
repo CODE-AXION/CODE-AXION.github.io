@@ -24,6 +24,7 @@ const initialState = {
     },
 
     chat_message_page: 1,
+    unread_message_count: 0,
     selectedChat: [],
     mode: '',
     chat_message: ''
@@ -86,6 +87,10 @@ export const chatSlice = createSlice({
         },
         setChatMessagePage: (state,action) => {
             state.chat_message_page = action.payload
+        },
+        setUnreadMessageCount: (state,action) => {
+
+            state.unread_message_count = action.payload
         }
 
     },
@@ -99,7 +104,8 @@ export const { setUserChatContacts, setUserChatContactsLoading,
     setContactId,
     setShowAddAccountDialog, setShowAddGroupDialog,
     setShowDeleteMessageConfirmationDialog,
-    setChatMessagePage
+    setChatMessagePage,
+    setUnreadMessageCount
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

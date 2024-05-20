@@ -32,16 +32,16 @@ export const useOnLoadChat = () => {
 
             fetchChatMessages(authUser,selectedChatObject?.id, isMounted, true, selectedChatObject?.is_group, chat_message_page);
 
-            // const interval = setInterval(() => {
-            //     dispatch(setChatMessagePage(1)) 
-            //     // fetchChatMessages(authUser,selectedChatObject?.id, isMounted, false, selectedChatObject?.is_group);
-            // }, 15000);
+            const interval = setInterval(() => {
+                dispatch(setChatMessagePage(1)) 
+                // fetchChatMessages(authUser,selectedChatObject?.id, isMounted, false, selectedChatObject?.is_group);
+            }, 15000);
 
-            // return () => {
+            return () => {
 
-            //     isMounted = false;
-            //     clearInterval(interval);
-            // };
+                isMounted = false;
+                clearInterval(interval);
+            };
         }
 
     }, [selectedChat]);

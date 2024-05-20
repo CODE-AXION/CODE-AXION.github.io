@@ -48,7 +48,8 @@ const Chat = () => {
             const container = containerRef.current;
             const scrollTop = messageElement.offsetTop - container.offsetTop;
             // Scroll to the calculated position
-            container.scrollTop = scrollTop;
+            // container.scrollTop = scrollTop;
+            containerRef.current.scrollTop = 100;
         }
     };
     useLayoutEffect(() => {
@@ -79,15 +80,25 @@ const Chat = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${API_ROUTES?.chat?.ChatMessages}?contact_user_id=${selectedChat?.pivot?.channel_id}&sender_id=${authUser?.id}&page=${chat_message_page}`);
-                if (chat_message_page == 1) {
-                    dispatch(setUserChatMessages([...response?.data?.data]));
-                } else {
+                const isGroupChat = selectedChat.is_group;
+                const baseURL = API_ROUTES?.chat?.ChatMessages;
 
-                    dispatch(setUserChatMessages([...response?.data?.data, ...chat_messages]));
-                }
+                const params = {
+                    sender_id: authUser?.id,
+                    page: chat_message_page
+                };
 
-                setScrollToKey(response?.data?.data[0]?.id);
+                const response = await axios.get(baseURL, {
+                    params: isGroupChat ? { ...params, group_id: selectedChat?.id } : { ...params, contact_user_id: selectedChat?.pivot?.channel_id }
+                });
+
+                const fetchedMessages = response?.data?.data || [];
+                
+                dispatch(setUserChatMessages(chat_message_page === 1 ? fetchedMessages : [...fetchedMessages, ...chat_messages]));
+                setTimeout(() => {
+                    setScrollToKey(fetchedMessages[0]?.id);
+                }, 0);
+
             } catch (error) {
                 console.error("Error fetching messages:", error);
             }
@@ -229,13 +240,13 @@ const Chat = () => {
             <div className="flex h-screen overflow-hidden">
 
                 {/* Sidebar */}
-                <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+                {/* <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> */}
 
                 {/* Content area */}
                 <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
 
                     {/*  Site header */}
-                    <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+                    {/* <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> */}
 
                     <main>
                         {
@@ -320,31 +331,22 @@ const Chat = () => {
                                                 <ChatHeader />
 
                                                 {chat_messages_loader && <LinearProgress />}
-                                                <button onClick={() => scrollToMessageById(113)}>Search for Message ID 1</button>
-                                                <div> {chat_message_page}</div>
-                                                {<div ref={containerRef} className='p-4 overflow-y-scroll h-[90%]' onScroll={(e) => handleScroll(e, chat_message_page)}>
-
-                                                    {/* {chat_messages.map((msg, index) => (
-                                                        msg.date ? (
-                                                            <div key={index} className='py-2 flex justify-center items-center'>
-                                                                <span id="msg_day" className='px-2 py-1 text-xs shadow font-medium rounded-md text-gray-600 bg-white border-gray-600'>
-                                                                    {msg.date}
-                                                                </span>
-                                                            </div>
-                                                        ) : (
-                                                            <Message
-                                                                key={msg.id}
-                                                                msg={msg}
-                                                                ref={(el) => (itemRefs.current[msg.id] = el)}
-                                                                handleShowOldReply={scrollToMessageById}
-                                                            />
-                                                        )
-                                                    ))} */}
+                                                {<div ref={containerRef} className='p-4 overflow-y-scroll h-[85%] relative' onScroll={(e) => handleScroll(e, chat_message_page)}>
+                                                    <div>New Messages { unreadMessageCount } </div>
+                                                    {chat_messages.map((msg, index) => (
+                                                        
+                                                        <Message
+                                                            key={msg.id}
+                                                            msg={msg}
+                                                            ref={(el) => (itemRefs.current[msg.id] = el)}
+                                                            handleShowOldReply={scrollToMessageById}
+                                                        />
+                                                    ))}
 
 
-                                                    {Object.keys(groupedMessages).map(dateKey => (
+                                                    {/* {Object.keys(groupedMessages).map(dateKey => (
                                                         <div key={dateKey}>
-                                                            <div className='py-2 flex justify-center items-center'>
+                                                            <div className='py-2 sticky top-0 flex justify-center items-center'>
                                                                 <span id="msg_day" className='px-2 py-1 text-xs shadow font-medium rounded-md text-gray-600 bg-white border-gray-600'>
                                                                     {dateKey}
                                                                 </span>
@@ -358,7 +360,7 @@ const Chat = () => {
                                                                 />
                                                             ))}
                                                         </div>
-                                                    ))}
+                                                    ))} */}
 
 
                                                 </div>}

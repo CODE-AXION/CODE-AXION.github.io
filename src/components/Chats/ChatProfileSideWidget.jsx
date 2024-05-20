@@ -1,7 +1,7 @@
 // import React from 'react'
 
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedChat } from "../../stores/chat/chat";
+import { setChatMessagePage, setSelectedChat } from "../../stores/chat/chat";
 import { useChat } from "../../hooks/chat";
 
 const ChatProfileSideWidget = ({ user, username, profileImg, message, unseen_message_count }) => {
@@ -13,6 +13,7 @@ const ChatProfileSideWidget = ({ user, username, profileImg, message, unseen_mes
         <>
             <div onClick={() => {
                 dispatch(setSelectedChat(user));
+                dispatch(setChatMessagePage(1))
             }} className='cursor-pointer flex items-start gap-2  border border-slate-200 py-3 px-2 border-r-0 border-l-0 border-t-0'>
                 <img className="w-11 h-11 object-cover p-1 rounded-full " src={profileImg} alt="Bordered avatar" />
                 <div className="w-full">
