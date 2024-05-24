@@ -6,7 +6,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useDispatch, useSelector } from 'react-redux';
 import { useChat } from '../../hooks/chat';
-import { setMessage,setSelectedChat,setShowDeleteMessageConfirmationDialog  } from '../../stores/chat/chat';
+import { setMessage,setShowDeleteMessageConfirmationDialog  } from '../../stores/chat/chat';
 
 export default function DeleteMessageDialog({ message }) {
 

@@ -169,42 +169,12 @@ const Chat = () => {
     };
 
 
-
     const handleScroll = async (e, page_no) => {
         let element = e.target;
 
-        // const { scrollTop, clientHeight, scrollHeight } = containerRef.current;
-        // if (scrollTop + clientHeight >= scrollHeight - 10) {
-
-        //     console.log('df')
-
-        //     const response = await axios.get(`${API_ROUTES.chat.ChatMessages}?contact_user_id=${selectedChat?.pivot.channel_id}&sender_id=${authUser?.id}&page=${page - 1}`);
-        //     // dispatch(setUserChatMessages([...chat_messages,...response?.data?.data]))
-        //     // // console.log(chat_messages.reverse())
-        //     // setScrollToKey(response?.data?.data[0]?.id);
-        //     // // chat_messages = chat_messages.reverse()
-        //     // setPage(page + 1);
-
-        //     dispatch(setUserChatMessages([...response?.data?.data,...chat_messages]))
-        //     // console.log(chat_messages.reverse())
-        //     setScrollToKey(response?.data?.data[0]?.id);
-        //     // chat_messages = chat_messages.reverse()
-        //     setPage(page - 1);
-        // }
-
         if (element.scrollTop === 0) {
-            // console.log(chatMessagePageRef.current)
-            // chatMessagePageRef.current += 1
 
-            // dispatch(setChatMessagePage(chat_message_page + 1));
             dispatch(setChatMessagePage(page_no + 1));
-            // console.log('new' + chat_message_page)
-            // const response = await axios.get(`${API_ROUTES.chat.ChatMessages}?contact_user_id=${selectedChat?.pivot.channel_id}&sender_id=${authUser?.id}&page=${page_no}`);
-            // page_no = page_no + 1;
-
-            // dispatch(setUserChatMessages([...response?.data?.data, ...chat_messages]))
-
-            // setScrollToKey(response?.data?.data[0]?.id);
 
         }
     }
@@ -238,87 +208,73 @@ const Chat = () => {
         <>
             <div className="flex h-screen overflow-hidden">
 
-                {/* Sidebar */}
-                {/* <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> */}
-
-                {/* Content area */}
                 <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-
-                    {/*  Site header */}
-                    {/* <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> */}
 
                     <main>
                         {
                             <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
-                                {/* <div className="sm:flex sm:justify-between sm:items-center mb-8">
-
-                                    <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-                                        <Link to={'/categories'}>
-                                            <Button variant="contained">List Categories</Button>
-                                        </Link>
-                                    </div>
-
-                                </div> */}
-
 
                                 {/* Cards */}
                                 <div className='border border-dotted flex items-start relative'>
 
-                                    <div className='border h-[80vh] w-4/12'>
+                                    <div className='border relative overflow-y-scroll px-4 h-[80vh] w-4/12'>
+                                        <div className='sticky top-0'>
+                                            {/* MAIN HEADER */}
+                                            <AppChatHeader />
 
-                                        {/* MAIN HEADER */}
-                                        <AppChatHeader />
+                                            {/* statusChatContactLoading */}
+                                            {user_chats_loader && <LinearProgress />}
 
-                                        {/* statusChatContactLoading */}
-                                        {user_chats_loader && <LinearProgress />}
+                                            <div className='px-4'>
 
-                                        <div className='px-4'>
+                                                <div className='mt-4'>
 
-                                            <div className='mt-4'>
+                                                    <ChatProfile user={authUser} />
 
-                                                <ChatProfile user={authUser} />
+                                                    <div className='mt-4 py-4 '>
 
-                                                <div className='mt-4 py-4 '>
+                                                        <FormControl className='w-full'>
+                                                            <TextField
+                                                                size="small"
+                                                                variant="standard"
+                                                                defaultValue="How can we help"
+                                                                fullWidth
+                                                                InputProps={{
+                                                                    startAdornment: (
+                                                                        <InputAdornment position="start">
+                                                                            <SearchIcon />
+                                                                        </InputAdornment>
+                                                                    )
+                                                                }}
+                                                            />
+                                                        </FormControl>
 
-                                                    <FormControl className='w-full'>
-                                                        <TextField
-                                                            size="small"
-                                                            variant="standard"
-                                                            defaultValue="How can we help"
-                                                            fullWidth
-                                                            InputProps={{
-                                                                startAdornment: (
-                                                                    <InputAdornment position="start">
-                                                                        <SearchIcon />
-                                                                    </InputAdornment>
-                                                                )
-                                                            }}
-                                                        />
-                                                    </FormControl>
+                                                    </div>
+
+
 
                                                 </div>
 
 
-
                                             </div>
-
-
                                         </div>
 
-                                        {user_chats?.conversations?.map((user, index) => (
+                                        <div>
+                                            {user_chats?.conversations?.map((user, index) => (
 
-                                            <ChatProfileSideWidget
+                                                <ChatProfileSideWidget
 
-                                                username={user.name}
-                                                // unseen_message_count={user.unseen_message_count}
-                                                profileImg={user.avatar}
-                                                message={user?.pivot?.last_seen_message}
-                                                user={user}
-                                                key={user.unique_id}
+                                                    username={user.name}
+                                                    // unseen_message_count={user.unseen_message_count}
+                                                    profileImg={user.avatar}
+                                                    message={user?.pivot?.last_seen_message}
+                                                    user={user}
+                                                    key={user.unique_id}
 
-                                            />
-                                        ))}
+                                                />
+                                            ))}
+                                        </div>
 
                                     </div>
 
@@ -331,9 +287,8 @@ const Chat = () => {
 
                                                 {chat_messages_loader && <LinearProgress />}
                                                 {<div ref={containerRef} className='p-4 overflow-y-scroll h-[85%] relative' onScroll={(e) => handleScroll(e, chat_message_page)}>
-                                                    <div>New Messages { unreadMessageCount } </div>
                                                     {chat_messages.map((msg, index) => (
-                                                        
+
                                                         <Message
                                                             key={msg.id}
                                                             msg={msg}
