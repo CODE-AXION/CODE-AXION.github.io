@@ -48,8 +48,8 @@ function App() {
     <>
 
       <Routes>
+        <Route exact path="/categories" element={<CategoryList />} />
         {/* <Route exact path="/dashboard" element={<Dashboard  />}  />
-        <Route exact path="/categories" element={<CategoryList handleLoadingChange={(loadingChange) => setIsLoading(loadingChange)} />} />
         <Route exact path="/categories/create" element={<CreateCategory handleLoadingChange={(loadingChange) => setIsLoading(loadingChange)} />} />
         <Route exact path="/categories/edit/:id" element={<EditCategory handleLoadingChange={(loadingChange) => setIsLoading(loadingChange)} />} /> {/* Pass handleLoadingChange */}
         {/* <Route exact path="/categories/show/:id" element={<ShowCategoryPage handleLoadingChange={(loadingChange) => setIsLoading(loadingChange)} />}  /> Pass handleLoadingChange */} 

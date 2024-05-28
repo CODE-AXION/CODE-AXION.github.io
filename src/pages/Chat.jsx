@@ -48,8 +48,8 @@ const Chat = () => {
             const container = containerRef.current;
             const scrollTop = messageElement.offsetTop - container.offsetTop;
 
-            // container.scrollTop = scrollTop;
-            containerRef.current.scrollTop = 100;
+            container.scrollTop = scrollTop;
+            // containerRef.current.scrollTop = 100;
         }
     };
     useLayoutEffect(() => {
@@ -73,6 +73,7 @@ const Chat = () => {
         chat_messages_loader,
         selectedChat,
         chat_message_page,
+        unreadMessageCount,
         message: chat_message,
     } = useSelector((state) => state?.chat);
 
@@ -287,6 +288,7 @@ const Chat = () => {
 
                                                 {chat_messages_loader && <LinearProgress />}
                                                 {<div ref={containerRef} className='p-4 overflow-y-scroll h-[85%] relative' onScroll={(e) => handleScroll(e, chat_message_page)}>
+                                                    <div>New Messages {unreadMessageCount} </div>
                                                     {chat_messages.map((msg, index) => (
 
                                                         <Message

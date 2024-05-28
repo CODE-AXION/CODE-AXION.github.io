@@ -8,7 +8,7 @@ const Message = forwardRef(({ msg, handleShowOldReply }, ref) => {
     return (
         <div ref={ref} className={msg.isSender ? 'flex justify-end flex-start gap-4' : 'flex flex-start gap-4'}>
             {!msg.isSender && (
-                <img className="w-10 h-10 rounded-full" src={msg.sender.avatar} alt="Rounded avatar" />
+                <img className="w-10 h-10 rounded-full" src={msg?.sender?.avatar} alt="Rounded avatar" />
             )}
             <div className='relative'>
                 <div className='absolute top-0 text-xs right-0'>{msg.created_at}</div>

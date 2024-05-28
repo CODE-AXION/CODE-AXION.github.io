@@ -6,16 +6,16 @@ import chat, {
     setUserChatContacts, setUserChatContactsLoading,
     setUserChatMessages, setChatMessagesLoading,
     setMessage,
-    setUserContactsLoading, setUserContacts, setShowDeleteMessageConfirmationDialog, setChatMessagePage
+    setUserContactsLoading, setUserContacts, setShowDeleteMessageConfirmationDialog, setChatMessagePage, setChatMaxId
 } from '../stores/chat/chat';
 import { getChatContacts, getUserChatMessages, getUserContacts, getUserGroupChatMessages, sendEditedMessageToUser, sendMessageToUser } from '../lib/api/chatApi';
 
-export const useChat = () => {
+export const useChat = (props) => {
 
 
     const dispatch = useDispatch();
     const {
-        chat_message_page,
+        chat_message_page, chat_messages
     } = useSelector((state) => state?.chat);
     // // fetch sidebar chat contacts
     const fetchChatContacts = async (isMounted) => {
@@ -60,8 +60,25 @@ export const useChat = () => {
 
                     } else {
 
+                        function uniq(data,key){
+                            return [
+                                ...new Map(
+                                    data.map(x => [key(x),x])
+                                ).values()
+                            ]
+                        }
                         const response = await getUserChatMessages(selectedChatId, authUser.id,chat_message_page);
-                        dispatch(setUserChatMessages(response.data.data))
+                        const newMessages = uniq([...chat_messages,...response.data.data],it => it.id);
+                        dispatch(setUserChatMessages(newMessages))
+                        // dispatch(setUserChatMessages(response.data.data))
+                        dispatch(setChatMaxId(response.data.max_id))
+                        // console.log(chat_max_id)
+                        // if(props?.selectedChat?.pivot?.id != undefined)
+                        // {
+                        //     updateLastSeenMessage(props?.selectedChat?.pivot?.id,chat_max_id)
+                        // }
+
+                        return response;
                     }
                 }
             }
@@ -177,6 +194,7 @@ export const useChat = () => {
             fetchChatMessages(authUser, selectedChat?.pivot?.channel_id, true, true, false)
         }
     }
+
 
     return {
         fetchChatContacts,

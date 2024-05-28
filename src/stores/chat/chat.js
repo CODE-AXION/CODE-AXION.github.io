@@ -24,6 +24,8 @@ const initialState = {
     },
 
     chat_message_page: 1,
+    unreadMessageCount: 0,
+    chat_max_id: 0,
     selectedChat: [],
     mode: '',
     chat_message: ''
@@ -87,6 +89,12 @@ export const chatSlice = createSlice({
         setChatMessagePage: (state,action) => {
             state.chat_message_page = action.payload
         },
+        setUnreadMessageCount: (state,action) => {
+            state.unreadMessageCount = action.payload
+        },
+        setChatMaxId: (state,action) => {
+            state.chat_max_id = action.payload
+        }
     },
 });
 
@@ -98,7 +106,8 @@ export const { setUserChatContacts, setUserChatContactsLoading,
     setContactId,
     setShowAddAccountDialog, setShowAddGroupDialog,
     setShowDeleteMessageConfirmationDialog,
-    setChatMessagePage,
+    setChatMessagePage,setUnreadMessageCount,
+    setChatMaxId
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

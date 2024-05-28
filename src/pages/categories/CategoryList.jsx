@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import Sidebar from '../../partials/Sidebar';
 import Header from '../../partials/Header';
@@ -11,6 +11,7 @@ import MuiPagination from '@mui/material/Pagination';
 import { Link, NavLink } from 'react-router-dom';
 import Skelly from '../../components/Skelly';
 import { useSelector } from 'react-redux';
+import { Stack } from '@mui/material';
 
 const CategoryList = ({ handleLoadingChange }) => {
 
@@ -18,8 +19,13 @@ const CategoryList = ({ handleLoadingChange }) => {
     const [categories, setCategories] = useState([]);
     const [categoriesCount, setCategoriesCount] = useState(0);
     const [sortModel, setSortModel] = useState();
-
+    const [rowSelectionModel, setRowSelectionModel] = useState([]);
     const [query, setQuery] = useState([]);
+    const [queryOptions, setQueryOptions] = useState({});
+    const [filterModel, setFilterModel] = useState({
+        column: '',
+        value: ''
+    });
 
     const [paginationModel, setPaginationModel] = useState({
         page: 0,
@@ -27,20 +33,25 @@ const CategoryList = ({ handleLoadingChange }) => {
         pageSize: 10
     });
 
+    const onFilterChange = useCallback((quickSearchFilter) => {
+        console.log(...quickSearchFilter.items)
 
-    const paginationHandler = (model) => {
-        setPaginationModel({
-            ...paginationModel,
-            page: model.page + 1
-        });
-    };
-    const onFilterChange = (quickSearchFilter) => {
+        // Here you save the data you need from the filter model
+        setQueryOptions({ filterModel: { ...quickSearchFilter.items } });
         setQuery(quickSearchFilter.quickFilterValues)
-    }
+      }, []);
+
+      
+    // const onFilterChange = (quickSearchFilter) => {
+    //     setQuery(quickSearchFilter.quickFilterValues)
+    // }
 
 
+    useEffect(() => {
+        // delete multiple rows
+    },[rowSelectionModel])
 
-
+ 
 
     useEffect(() => {
 
@@ -57,7 +68,9 @@ const CategoryList = ({ handleLoadingChange }) => {
                         page: paginationModel?.page + 1,
                         perPage: paginationModel?.pageSize,
                         sort: sortModel,
-                        q: query
+                        q: query,
+                        filterModel: queryOptions,
+
                     },
                 });
 
@@ -78,7 +91,7 @@ const CategoryList = ({ handleLoadingChange }) => {
         fetchCategories();
 
 
-    }, [query, sortModel, paginationModel.page, paginationModel.pageSize]);
+    }, [query, sortModel, paginationModel.page, paginationModel.pageSize, onFilterChange, queryOptions]);
 
 
     const { load, isLoading, user } = useAuth({ middleware: 'auth' })
@@ -90,31 +103,51 @@ const CategoryList = ({ handleLoadingChange }) => {
     // if (isLoading || !user) return null;
 
     const columns = [
-        { field: 'id', headerName: 'ID', width: 90 },
+        { field: 'id', headerName: 'ID', width: 5 },
         {
             field: 'name',
             headerName: 'Category name',
-            width: 150,
-            editable: true,
+            editable: false,
+            minWidth: 150, flex: 1
         },
         {
             field: 'description',
             headerName: 'Description name',
-            width: 150,
             editable: true,
+            minWidth: 150, flex: 1
         },
         {
             field: 'created_at',
             headerName: 'Created At',
-            width: 150,
             editable: true,
+            minWidth: 150, flex: 1
         },
         {
             field: 'updated_at',
             headerName: 'Updated at',
-            width: 110,
             editable: true,
+            minWidth: 110, flex: 1
+        },
+        {
+            field: 'actions',
+            headerName: 'actions',
+            minWidth: 250, flex: 1,
+            disableClickEventBubbling: true,
+            renderCell: (params) => {
+                const onClick = (e) => {
+                    const currentRow = params.row;
+                    return alert(JSON.stringify(currentRow, null, 4));
+                };
+
+                return (
+                    <>
+                        <Button sx={{ marginInline: 1 }} variant="outlined" color="warning" size="small" onClick={onClick}>Edit</Button>
+                        <Button sx={{ marginInline: 1 }} variant="outlined" color="error" size="small" onClick={onClick}>Delete</Button>
+                    </>
+                );
+            },
         }
+
     ];
 
 
@@ -164,10 +197,6 @@ const CategoryList = ({ handleLoadingChange }) => {
     const AuthUser = useSelector((state) => state.user.user);
 
 
-
-
-
-
     return (
         <div className="flex h-screen overflow-hidden">
 
@@ -180,7 +209,7 @@ const CategoryList = ({ handleLoadingChange }) => {
                 {/*  Site header */}
                 <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
                 <div>
-                    Logged In As { AuthUser?.name }
+                    Logged In As {AuthUser?.name}
                 </div>
                 <Skelly loading={load()} />
 
@@ -201,8 +230,6 @@ const CategoryList = ({ handleLoadingChange }) => {
 
                             </div>
 
-                         
-
                             {/* Cards */}
                             <div>
 
@@ -218,7 +245,11 @@ const CategoryList = ({ handleLoadingChange }) => {
                                             sortModel={sortModel}
                                             onSortModelChange={(oldSortModel) => setSortModel([...oldSortModel])}
                                             loading={paginationModel.isLoading}
-
+                                            keepNonExistentRowsSelected
+                                            onRowSelectionModelChange={(newRowSelectionModel) => {
+                                                setRowSelectionModel(newRowSelectionModel);
+                                            }}
+                                            rowSelectionModel={rowSelectionModel}
                                             slots={{
                                                 toolbar: QuickSearchBar,
                                                 pagination: CustomPagination
