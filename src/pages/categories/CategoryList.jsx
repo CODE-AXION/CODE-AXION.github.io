@@ -11,7 +11,7 @@ import MuiPagination from '@mui/material/Pagination';
 import { Link, NavLink } from 'react-router-dom';
 import Skelly from '../../components/Skelly';
 import { useSelector } from 'react-redux';
-import { Stack } from '@mui/material';
+import { Alert, Snackbar, Stack, TextField } from '@mui/material';
 
 const CategoryList = ({ handleLoadingChange }) => {
 
@@ -22,10 +22,7 @@ const CategoryList = ({ handleLoadingChange }) => {
     const [rowSelectionModel, setRowSelectionModel] = useState([]);
     const [query, setQuery] = useState([]);
     const [queryOptions, setQueryOptions] = useState({});
-    const [filterModel, setFilterModel] = useState({
-        column: '',
-        value: ''
-    });
+    const [snackbar, setSnackbar] = useState(null);
 
     const [paginationModel, setPaginationModel] = useState({
         page: 0,
@@ -39,19 +36,34 @@ const CategoryList = ({ handleLoadingChange }) => {
         // Here you save the data you need from the filter model
         setQueryOptions({ filterModel: { ...quickSearchFilter.items } });
         setQuery(quickSearchFilter.quickFilterValues)
-      }, []);
+    }, []);
 
-      
+
     // const onFilterChange = (quickSearchFilter) => {
     //     setQuery(quickSearchFilter.quickFilterValues)
     // }
 
 
+
+    const processRowUpdate = async (newRow) => {
+        // Make the HTTP request to save in the backend
+
+        setSnackbar({ children: 'User successfully saved', severity: 'success' });
+        return newRow;
+    }
+
+
+    const handleProcessRowUpdateError = useCallback((error) => {
+        console.log(error)
+        setSnackbar({ children: error.message, severity: 'error' });
+    }, []);
+
+
     useEffect(() => {
         // delete multiple rows
-    },[rowSelectionModel])
+    }, [rowSelectionModel])
 
- 
+
 
     useEffect(() => {
 
@@ -107,7 +119,7 @@ const CategoryList = ({ handleLoadingChange }) => {
         {
             field: 'name',
             headerName: 'Category name',
-            editable: false,
+            editable: true,
             minWidth: 150, flex: 1
         },
         {
@@ -219,6 +231,7 @@ const CategoryList = ({ handleLoadingChange }) => {
                         !load() &&
                         <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
+
                             <div className="sm:flex sm:justify-between sm:items-center mb-8">
 
                                 <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
@@ -228,6 +241,10 @@ const CategoryList = ({ handleLoadingChange }) => {
                                     </Link>
                                 </div>
 
+                            </div>
+
+                            <div className='my-4'>
+                                <TextField id="filled-basic" label="Filled" variant="filled" />
                             </div>
 
                             {/* Cards */}
@@ -242,14 +259,19 @@ const CategoryList = ({ handleLoadingChange }) => {
                                             paginationMode="server"
                                             sortingMode='server'
 
+
+                                            // for sorting
                                             sortModel={sortModel}
                                             onSortModelChange={(oldSortModel) => setSortModel([...oldSortModel])}
                                             loading={paginationModel.isLoading}
                                             keepNonExistentRowsSelected
+
+                                            // for deleting rows with multiple checkboxes
                                             onRowSelectionModelChange={(newRowSelectionModel) => {
                                                 setRowSelectionModel(newRowSelectionModel);
                                             }}
                                             rowSelectionModel={rowSelectionModel}
+
                                             slots={{
                                                 toolbar: QuickSearchBar,
                                                 pagination: CustomPagination
@@ -261,6 +283,11 @@ const CategoryList = ({ handleLoadingChange }) => {
                                                 },
                                             }}
 
+
+                                            processRowUpdate={processRowUpdate}
+                                            onProcessRowUpdateError={handleProcessRowUpdateError}
+
+                                            // for filtering 
                                             filterMode="server"
                                             onFilterModelChange={onFilterChange}
 
@@ -295,6 +322,18 @@ const CategoryList = ({ handleLoadingChange }) => {
                                             checkboxSelection
                                             disableRowSelectionOnClick
                                         />
+
+
+                                        {!!snackbar && (
+                                            <Snackbar
+                                                open
+                                                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                                                onClose={() => setSnackbar(null)}
+                                                autoHideDuration={6000}
+                                            >
+                                                <Alert {...snackbar} onClose={() => setSnackbar(null)} />
+                                            </Snackbar>
+                                        )}
                                     </Box>
                                 )}
                             </div>
