@@ -12,6 +12,9 @@ import { Link, NavLink } from 'react-router-dom';
 import Skelly from '../../components/Skelly';
 import { useSelector } from 'react-redux';
 import { Alert, Snackbar, Stack, TextField } from '@mui/material';
+import QuickSearchBar from '../../components/Datagrid/QuickSearchBar';
+import Pagination from '../../components/Datagrid/Pagination';
+import CustomPagination from '../../components/Datagrid/Pagination';
 
 const CategoryList = ({ handleLoadingChange }) => {
 
@@ -23,7 +26,6 @@ const CategoryList = ({ handleLoadingChange }) => {
     const [query, setQuery] = useState([]);
     const [queryOptions, setQueryOptions] = useState({});
     const [snackbar, setSnackbar] = useState(null);
-
     const [paginationModel, setPaginationModel] = useState({
         page: 0,
         isLoading: false,
@@ -31,22 +33,13 @@ const CategoryList = ({ handleLoadingChange }) => {
     });
 
     const onFilterChange = useCallback((quickSearchFilter) => {
-        console.log(...quickSearchFilter.items)
 
-        // Here you save the data you need from the filter model
         setQueryOptions({ filterModel: { ...quickSearchFilter.items } });
         setQuery(quickSearchFilter.quickFilterValues)
     }, []);
 
 
-    // const onFilterChange = (quickSearchFilter) => {
-    //     setQuery(quickSearchFilter.quickFilterValues)
-    // }
-
-
-
     const processRowUpdate = async (newRow) => {
-        // Make the HTTP request to save in the backend
 
         setSnackbar({ children: 'User successfully saved', severity: 'success' });
         return newRow;
@@ -81,7 +74,7 @@ const CategoryList = ({ handleLoadingChange }) => {
                         perPage: paginationModel?.pageSize,
                         sort: sortModel,
                         q: query,
-                        filterModel: queryOptions,
+                        ...queryOptions,
 
                     },
                 });
@@ -163,50 +156,53 @@ const CategoryList = ({ handleLoadingChange }) => {
     ];
 
 
-    function Pagination({ page, onPageChange, className }) {
-        const apiRef = useGridApiContext();
-        const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+    // function Pagination({ page, onPageChange, className }) {
+    //     const apiRef = useGridApiContext();
+    //     const pageCount = useGridSelector(apiRef, gridPageCountSelector);
 
-        return (
-            <MuiPagination
-                color="primary"
-                className={className}
-                count={pageCount}
-                page={page + 1}
-                onChange={(event, newPage) => {
-                    onPageChange(event, newPage - 1);
-                }}
-            />
-        );
-    }
+    //     return (
+    //         <MuiPagination
+    //             color="primary"
+    //             className={className}
+    //             count={pageCount}
+    //             page={page + 1}
+    //             onChange={(event, newPage) => {
+    //                 onPageChange(event, newPage - 1);
+    //             }}
+    //         />
+    //     );
+    // }
 
-    function CustomPagination(props) {
-        return <GridPagination ActionsComponent={Pagination} {...props} />;
-    }
+    // function CustomPagination(props) {
+    //     return <GridPagination ActionsComponent={Pagination} {...props} />;
+    // }
 
-    const QuickSearchBar = () => {
-        return (
-            <Box
-                sx={{
-                    p: 1,
-                    pt: 2,
-                    px: 2,
-                }}
-            >
-                <GridToolbar />
-                <GridToolbarQuickFilter
-                    quickFilterParser={(searchInput) =>
-                        searchInput
-                            .split(',')
-                            .map((value) => value.trim())
-                            .filter((value) => value !== '')
-                    }
-                    debounceMs={1000}
-                />
-            </Box>
-        );
-    }
+    // const QuickSearchBar = () => {
+    //     return (
+    //         <Box
+    //             sx={{
+    //                 p: 1,
+    //                 pt: 2,
+    //                 px: 2,
+    //             }}
+    //         >
+    //             <GridToolbar />
+    //             <GridToolbarQuickFilter
+    //                 quickFilterParser={(searchInput) =>
+    //                     searchInput
+    //                         .split(',')
+    //                         .map((value) => value.trim())
+    //                         .filter((value) => value !== '')
+    //                 }
+    //                 debounceMs={1000}
+    //             />
+    //         </Box>
+    //     );
+    // }
+
     const AuthUser = useSelector((state) => state.user.user);
+
+    const fieldsToRemove = ["id", "actions","updated_at","created_at"];
 
 
     return (
@@ -244,7 +240,14 @@ const CategoryList = ({ handleLoadingChange }) => {
                             </div>
 
                             <div className='my-4'>
-                                <TextField id="filled-basic" label="Filled" variant="filled" />
+                                { 
+                                    columns
+                                    ?.filter(item => !fieldsToRemove.includes(item.field))
+                                    ?.map((item, index) => (
+                                        
+                                        <TextField key={index} id="filled-basic" sx={{margin: 1}}  size="small" label={item.headerName} variant="filled" />
+                                    ))
+                                }
                             </div>
 
                             {/* Cards */}
